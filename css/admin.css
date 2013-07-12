@@ -1,0 +1,5 @@
+﻿.cpis-property-container{float:left;}
+.cpis-comment{color:#CCC;font-style:italic;}
+.cpis-file-list{border:1px dotted #dfdfdf; width:100%;}
+.cpis-file-list tr:first-child td{font-weight:bold;}
+.cpis-short-field{width: 100px;}

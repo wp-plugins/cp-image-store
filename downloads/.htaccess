@@ -1,0 +1,4 @@
+<FilesMatch "\.(?i:mp3|odf|pdf|rtf|txt|jpg|png|ogv|oga|ogg|wav)$>
+AddType application/octet-stream mp3 odf pdf rtf txt png jpg ogv oga ogg wav
+Header set Content-Disposition attachment
+</FilesMatch>
