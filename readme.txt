@@ -14,16 +14,16 @@ CP Image Store is an online store for the sale of image files: images, predefine
 
 CP Image Store features:
 
-				§ Allows selling image files via PayPal
-				§ Allows selling various resolution versions of the same image at tiered prices
-				§ Multiple online store settings: filter by author, color scheme, image type 
-					and categories. Set the number of columns in the music store. Pagination 
-					and sorting of results by title, popularity and date.
-				§ Associate various features to pictures: author, type of image, color scheme, 
-					and categories
-				§ Allows sharing songs in social networks (ex: Facebook, Twitter, Google+)
-				§ Shows a carousel with the top 10 images obtained with the filter values
-				§ Includes a module to track sales statistics
+    § Allows selling image files via PayPal
+    § Allows selling various resolution versions of the same image at tiered prices
+    § Multiple online store settings: filter by author, color scheme, image type 
+      and categories. Set the number of columns in the music store. Pagination 
+      and sorting of results by title, popularity and date.
+    § Associate various features to pictures: author, type of image, color scheme, 
+      and categories
+    § Allows sharing songs in social networks (ex: Facebook, Twitter, Google+)
+    § Shows a carousel with the top 10 images obtained with the filter values
+    § Includes a module to track sales statistics
 
 CP Image Store is an online store for the sale of image files: images, predefined pictures, clipart, drawings, vector images. For payment processing, CP Image Store uses PayPal, which is the most widely used payment gateway, safe and easy to use.
 
