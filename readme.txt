@@ -16,7 +16,7 @@ CP Image Store with Slideshow features:
 
     § Allows selling image files via PayPal
     § Allows selling various resolution versions of the image at tiered prices
-    § Multiple online store settings: filter by author, color scheme, image type 
+    § Multiple online store settings:filter by author, color scheme, image type 
       and categories. Set the number of columns in the music store. Pagination 
       and sorting of results by title, popularity and date
     § Associate various features to pictures: author, type of image, 

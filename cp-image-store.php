@@ -1520,7 +1520,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
             $carousel_query = $_select." ".$_from." ".$_where." ".$carousel_order_by." ".$carousel_limit;
             $carousel_results = $wpdb->get_results( $carousel_query );
             
-            if( count( $carousel_results ) >= 10 ){
+            if( count( $carousel_results ) ){
                 foreach ( $carousel_results as $result ){
                     $top_ten_carousel .= cpis_display_content( $result->ID, 'carousel', 'return' );
                 }
