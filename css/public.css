@@ -1,5 +1,5 @@
 ﻿/* IMAGE STORE PAGE */
-.cpis-image-store-left{ width: 25%; float: left; background: #F3F3F3; padding: 5px;}
+.cpis-image-store-left{ min-width: 25%; float: left; background: #F3F3F3; padding: 5px;}
 .cpis-column-title{ font-weight: bolder; }
 .cpis-filter{ margin-bottom: 10px; }
 .cpis-filter label{ display: block; clear: both; text-transform: capitalize;}

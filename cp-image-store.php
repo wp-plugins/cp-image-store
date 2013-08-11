@@ -1547,19 +1547,23 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                 ";
             $left .= "<div class='cpis-column-title'>".__('Filter by', CPIS_TEXT_DOMAIN)."</div>";
             if( $options[ 'store' ][ 'show_type_filters' ] ){
-                $left .= "<div class='cpis-filter'><label>".__(' type: ', CPIS_TEXT_DOMAIN)."</label>"._cpis_create_select_filter( 'filter_by_type', 'All images', 'cpis_type' )."</div>";
+                $str = _cpis_create_select_filter( 'filter_by_type', 'All images', 'cpis_type' );
+                if( !empty( $str ) ) $left .= "<div class='cpis-filter'><label>".__(' type: ', CPIS_TEXT_DOMAIN)."</label>$str</div>";
             }
             
             if( $options[ 'store' ][ 'show_color_filters' ] ){
-                $left .= "<div class='cpis-filter'><label>".__(' color scheme: ', CPIS_TEXT_DOMAIN)."</label>"._cpis_create_select_filter( 'filter_by_color', 'All color schemes', 'cpis_color' )."</div>";
+                $str = _cpis_create_select_filter( 'filter_by_color', 'All color schemes', 'cpis_color' );
+                if( !empty( $str ) ) $left .= "<div class='cpis-filter'><label>".__(' color scheme: ', CPIS_TEXT_DOMAIN)."</label>$str</div>";
             }
             
             if( $options[ 'store' ][ 'show_author_filters' ] ){
-                $left .= "<div class='cpis-filter'><label>".__(' authors: ', CPIS_TEXT_DOMAIN)."</label>"._cpis_create_select_filter( 'filter_by_author', 'All authors', 'cpis_author' )."</div>";
+                $str = _cpis_create_select_filter( 'filter_by_author', 'All authors', 'cpis_author' );
+                if( !empty( $str ) ) $left .= "<div class='cpis-filter'><label>".__(' authors: ', CPIS_TEXT_DOMAIN)."</label>$str</div>";
             }
             
             if( $options[ 'store' ][ 'show_category_filters' ] ){
-                $left .= "<div class='cpis-filter'><label>".__(' categories: ', CPIS_TEXT_DOMAIN)."</label>"._cpis_create_select_filter( 'filter_by_category', 'All categories', 'cpis_category', 1 )."</div>";
+                $str = _cpis_create_select_filter( 'filter_by_category', 'All categories', 'cpis_category', 1 );
+                if( !empty( $str ) ) $left .= "<div class='cpis-filter'><label>".__(' categories: ', CPIS_TEXT_DOMAIN)."</label>$str</div>";
             }
             
             $left .="

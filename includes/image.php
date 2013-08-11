@@ -804,7 +804,6 @@ if( !function_exists( 'cpis_save_image' ) ){
                                                                                 <form action="'.$arr[ 'submit' ].'" method="POST" data-ajax="false">
                                                                                     '.$arr[ 'file' ].$arr[ 'button' ].'
                                                                                 </form>
-                                                                                    '.$arr[ 'discount' ].'
                                                                             </div>' : '' ).
                                     
                                 '

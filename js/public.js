@@ -1,4 +1,11 @@
 ﻿(function($){
+	var xmouse, ymouse;
+    
+    $(document).bind( 'mousemove', function( e ){
+        xmouse = e.pageX;
+        ymouse = e.pageY;
+    } );
+    
 	var cpis_mousemove = function( e ) {
         if( 
             e.pageX < e.data.x1 ||
@@ -19,39 +26,47 @@
         var d = $( '#cpis_image'+id );
         
         e = $( e );
-        
-        if(d.length){
-            if( incorner ){
-                d.show().position(
-                    {
-                        my: "left top",
-                        at: "left top",
-                        of: e
-                    }
-                );
-            }else{
-                d.show().position(
-                    {
-                        my: "center",
-                        at: "center",
-                        of: e
-                    }
-                );
-            }
-            
-        
-            var o = d.offset();
-            $( document ).bind( 
-                'mousemove', 
-                {
-                    x1: o.left,
-                    y1: o.top,
-                    x2: o.left + d.width(),
-                    y2: o.top + d.height()
-                },
-                cpis_mousemove
-            );
-        }    
+        setTimeout(
+            function(){
+                if(d.length){
+                    var e_o = e.offset();
+                    if( xmouse >= e_o.left && xmouse <= e_o.left + e.width() && 
+                        ymouse >= e_o.top  && ymouse <= e_o.top  + e.height() ){
+                    
+                        if( incorner ){
+                            d.show().position(
+                                {
+                                    my: "left top",
+                                    at: "left top",
+                                    of: e
+                                }
+                            );
+                        }else{
+                            d.show().position(
+                                {
+                                    my: "center",
+                                    at: "center",
+                                    of: e
+                                }
+                            );
+                        }
+                        
+                       var d_o = d.offset();
+                        $( document ).bind( 
+                            'mousemove', 
+                            {
+                                x1: d_o.left,
+                                y1: d_o.top,
+                                x2: d_o.left + d.width(),
+                                y2: d_o.top + d.height()
+                            },
+                            cpis_mousemove
+                        );
+                    }    
+                }    
+            }, 
+            1000 
+        );    
     };
     
     window[ 'cpis_buynow' ] = function( e ){
