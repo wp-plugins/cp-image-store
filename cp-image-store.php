@@ -1279,7 +1279,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
  if( !function_exists( 'cpis_upload_dir' ) ){
     function cpis_upload_dir( $path ){
         global $post;
-        if( 'cpis_image' == $post->post_type ){
+        if( isset( $post ) && 'cpis_image' == $post->post_type ){
             $path[ 'path' ] = CPIS_PLUGIN_DIR.'/uploads/files'.$path[ 'subdir' ];
             $path[ 'url' ] = CPIS_PLUGIN_URL.'/uploads/files'.$path[ 'subdir' ];
             $path[ 'basedir' ] = CPIS_PLUGIN_DIR.'/uploads/files';
