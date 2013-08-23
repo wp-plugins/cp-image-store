@@ -584,9 +584,9 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
         if( !is_null( $p ) ) $exclude[] = $p->ID;
         
         for ( $i=0; $i<$length; $i++ ) {
-            $page = & $pages[$i];
+            $page = &$pages[$i];
             
-            if ( in_array( $page->ID, $exclude ) ) {
+            if ( isset( $page ) && in_array( $page->ID, $exclude ) ) {
                 // Finally, delete something(s)
                 unset( $pages[$i] );
             }
