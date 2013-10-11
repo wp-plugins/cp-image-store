@@ -211,7 +211,7 @@ A: Be sure the GD Library is enabled in the PHP script on web server.
 
 = Q: How to insert a product or products list on sidebar? =
 
-A: Go to the widgets section and insert the insert the "Image Store Product" or "Image Store Product List" in sidebar.
+A: Go to the widgets section and insert the "Image Store Product", or the "Image Store Product List" on sidebar.
 
 = Q: How can I to know the ID of image? =
 
@@ -221,19 +221,19 @@ The image's ID is required to insert the image on sidebars or pages.
 
 = Q: How can I search an image by the image's content or title? =
 
-A: Type the word you are searching in the search box, and press the "enter" key. 
+A: Type the word you are searching in the search box (available in the store's page), and press the "enter" key. 
 
-= Q: Is it possible to hide the image preview window? =
+= Q: Is possible to hide the image preview window? =
 
 A: To hide the image preview window, go to the settings of Image Store, and uncheck the option "Display preview on mouse over". 
 
 = Q: Is there another payment gateway other than PayPal? =
 
-A: The current version allows only PayPal as payment gateway. 
+A: The current version of plugin allows only PayPal as payment gateway. 
 
 = Q: Why after press the "Buy Now" button the page is not redirected to PayPal? =
 
-A: Please, go to the settings page of Image Store, and be sure that email associated to the PayPal account was entered. If the email associated to the PayPal account was typed, go to the product's page, and be sure that image's price is different to zero.
+A: Please, go to the settings page of Image Store, and be sure that email associated to the PayPal account was entered. If the email associated to the PayPal account was typed, go to the product's page, and be sure that image's price is nonzero.
 
 == Screenshots ==
 1. Image Store
