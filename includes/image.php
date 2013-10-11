@@ -382,15 +382,16 @@ if( !function_exists( 'cpis_save_image' ) ){
         $format = array( '%s' );
         
         if( !empty( $image ) ){
-            // Set an update query
-            $wpdb->update(
-                $table, 
-                $data,
-                array('id'=>$id),
-                $format,
-                array('%d')
-            );
-            
+            if( !empty( $data ) ){
+                // Set an update query
+                $wpdb->update(
+                    $table, 
+                    $data,
+                    array('id'=>$id),
+                    $format,
+                    array('%d')
+                );
+            }
         }else{
             // Set an insert query
             $data['id'] = $id;
@@ -515,13 +516,13 @@ if( !function_exists( 'cpis_save_image' ) ){
             if ( 
                 $wpdb->delete( 
                     $wpdb->prefix.CPIS_IMAGE_FILE,
-                    array( 'id_file', $id),
+                    array( 'id_file' => $id),
                     array( '%d' )
                 )
             ){
                 $wpdb->delete( 
                     $wpdb->prefix.CPIS_FILE,
-                    array( 'id', $id),
+                    array( 'id' => $id),
                     array( '%d' )
                 );
             }    
@@ -604,8 +605,16 @@ if( !function_exists( 'cpis_save_image' ) ){
             }
             
         }
-        
+ 
         switch( $type ){
+            case 'widget':
+                $data_arr[ 'preview' ] = false;
+                if( $output == 'echo' )
+                    print cpis_print_multiple( $data_arr );
+                else
+                    return cpis_print_multiple( $data_arr );
+            break;
+            
             case 'multiple':
                 if( $options[ 'display' ][ 'preview' ] ) $data_arr[ 'preview' ] = true;
                 if( $output == 'echo' )
@@ -771,6 +780,7 @@ if( !function_exists( 'cpis_save_image' ) ){
  
  if( !function_exists( 'cpis_print_store' ) ){
      function cpis_print_store( $arr ){
+        global $cpis_images_preview;
         $code = '
             <div class="cpis-image">
             <!-- IMAGE PREVIEW -->
@@ -783,7 +793,7 @@ if( !function_exists( 'cpis_save_image' ) ){
             <!-- IMAGE DATA -->
         ';
         if( isset( $arr[ 'preview' ] ) ){
-            $code .= '    
+            $cpis_images_preview .= '    
                 <div id="cpis_image'.$arr[ 'id' ].'" class="cpis-image-data">
                     <table id="cpis_table">
                         <tr>
@@ -820,6 +830,7 @@ if( !function_exists( 'cpis_save_image' ) ){
 
  if( !function_exists( 'cpis_print_multiple' ) ){
      function cpis_print_multiple( $arr ){
+        global $cpis_images_preview;
         $code = '
             <div class="cpis-image-multiple">
                 <!-- IMAGE PREVIEW -->
@@ -836,8 +847,9 @@ if( !function_exists( 'cpis_save_image' ) ){
                 '</div>
                 <!-- IMAGE DATA -->
         ';
-        if( isset( $arr[ 'preview' ] ) ){
-            $code .= '    
+        
+        if( isset( $arr[ 'preview' ] ) && $arr[ 'preview' ] ){
+            $cpis_images_preview .= '    
                 <div id="cpis_image'.$arr[ 'id' ].'" class="cpis-image-data">
                     <table id="cpis_table">
                         <tr>

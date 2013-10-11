@@ -16,11 +16,14 @@ CP Image Store with Slideshow features:
 
     § Allows selling image files via PayPal
     § Allows selling various resolution versions of the image at tiered prices
-    § Multiple online store settings:filter by author, color scheme, image type 
-      and categories. Set the number of columns in the music store. Pagination 
-      and sorting of results by title, popularity and date
+    § Multiple online store settings:display a search box, filter by author, 
+      color scheme, image type and categories. Set the number of columns in the 
+      music store. Pagination, and sorting of results by title, popularity and 
+      publication date
     § Associate various features to pictures: author, type of image, 
       color scheme, and categories
+    § Allows to insert a particular image in posts or pages, and as widget 
+      on website's sidebars
     § Allows sharing songs in social networks (ex: Facebook, Twitter, Google+)
     § Shows a carousel with the top 10 images obtained with the filter values
     § Includes a module to track sales statistics
@@ -34,10 +37,11 @@ The base plugin, available for free from the WordPress Plugin Directory has all 
 **Premium Features**
 
 *	Includes a shopping cart to buy multiple products in a single purchase
+*	Allows to insert list of products filtered by top selling or newest products
 *	Allows including a watermark on image previews
 *	Allows to set discounts to promote sales
-* Allows to set discount coupons to promote sales from specific sources
-* Allows to group all purchased items in one compacted download
+*   Allows to set discount coupons to promote sales from specific sources
+*   Allows to group all purchased items in one compacted download
 
 
 If you want more information about this plugin or another one don't doubt to visit my website:
@@ -67,6 +71,7 @@ The setup interface includes the following fields:
 This section contains the setup options for the CP Image Store with Slideshow.
 
 *   URL of Store page: Enter the URL of the web page where the CP Image Store with Slideshow was inserted. The URL of the store will be used to enable return from the product page to the store page.
+*   Display a search box: Inserts a search box in the web page of the CP Image Store with Slideshow to search images by texts
 *   Allow filtering by type: Inserts a field in the web page of the CP Image Store with Slideshow to filter images by type (possible types of images: Clip Art, Photo, Draws, Vectors, etc.)
 *   Allow filtering by color: Inserts a field in the web page of the CP Image Store with Slideshow to filter the products by their color scheme (color schemes possible: Full color, Black and White, Sepia, etc.).
 *   Allow filtering by authors: Inserts a field in the web page of the CP Image Store with Slideshow to filter products by their author.
@@ -174,6 +179,18 @@ The button for the insertion of the CP Image Store with Slideshow creates a shor
 
 The button for inserting an image allows to enter the ID of the image and select the layout of the product to be displayed.
 
+**Publishing a particular image**
+
+To promote an particular image from other website's pages, or sidebars, there is available a icon over the pages/posts content. Pressing the icon is displayed a dialog for type the image's ID.
+
+If you want to insert the image on the website sidebars, there is available a widget in the widgets section.
+
+**Publishing a list of images (Available only in the Premium version)**
+
+To insert a list of images filtered by top selling or newest images, there is available a icon over the pages/posts content. Pressing the icon is displayed a dialog for select the filter option and type the number of images to display and the columns to distribute the images.
+
+If you want to insert the images list on the website sidebars, there is available a widget in the widgets section.
+
 **Sales statistics**
 
 When a sale takes place, a notification is emailed to the CP Image Store with Slideshow administrator, but sales reports can also be viewed. To do this, go to the menu option "Image Store / Sales Report".
@@ -192,10 +209,39 @@ A: First, go to the settings page of CP Image Store with Slideshow and be sure t
 
 A: Be sure the GD Library is enabled in the PHP script on web server.
 
+= Q: How to insert a product or products list on sidebar? =
+
+A: Go to the widgets section and insert the insert the "Image Store Product" or "Image Store Product List" in sidebar.
+
+= Q: How can I to know the ID of image? =
+
+A: Go to the image page in WordPress and pay attention to the URL, the parameter "post" contains the image's ID. 
+
+The image's ID is required to insert the image on sidebars or pages.
+
+= Q: How can I search an image by the image's content or title? =
+
+A: Type the word you are searching in the search box, and press the "enter" key. 
+
+= Q: Is it possible to hide the image preview window? =
+
+A: To hide the image preview window, go to the settings of Image Store, and uncheck the option "Display preview on mouse over". 
+
+= Q: Is there another payment gateway other than PayPal? =
+
+A: The current version allows only PayPal as payment gateway. 
+
+= Q: Why after press the "Buy Now" button the page is not redirected to PayPal? =
+
+A: Please, go to the settings page of Image Store, and be sure that email associated to the PayPal account was entered. If the email associated to the PayPal account was typed, go to the product's page, and be sure that image's price is different to zero.
+
 == Screenshots ==
 1. Image Store
-2. Images list
+2. Images List
 3. Image Edition Interface
 4. Insertion Buttons for Image Store and Image Store Product
-5. Sales Reports
-6. Filtering Sales Report
+5. Insertion Product's Dialog 
+6. Dialog to Insert Images Lists
+7. Available Widgets to Insert an Image or Image List on Website's Sidebars
+8. Sales Reports
+9. Filtering Sales Report

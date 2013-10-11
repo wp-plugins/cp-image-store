@@ -1,9 +1,34 @@
 <?php
 	error_reporting( E_ERROR || E_PARSE );
     
-    if( !class_exists( 'WP_Http' ) ){
-        include_once( ABSPATH . WPINC. '/class-http.php' );
-    }    
+    if( !function_exists( 'cpis_checkMemory' ) ){
+        // Check if the PHP memory is sufficient
+        function cpis_checkMemory( $files = array() ){
+            $required = 0;
+            
+            $m = ini_get( 'memory_limit' );
+            $m = trim($m);
+            $l = strtolower($m[strlen($m)-1]); // last
+            switch($l) {
+                // The 'G' modifier is available since PHP 5.1.0
+                case 'g':
+                    $m *= 1024;
+                case 'm':
+                    $m *= 1024;
+                case 'k':
+                    $m *= 1024;
+            }
+
+            foreach ( $files as $file ){
+                $memory_available = $m - memory_get_usage(true);
+                if( file_exists( $file ) ){
+                    $required += filesize( $file );
+                    if( $required >= $memory_available - 100 ) return false;
+                }else return false;
+            }
+            return true;
+        } 
+    } // cpis_checkMemory
     
     global $htaccess_accepted, $options;
     
@@ -15,7 +40,10 @@
 		$new_file_name = md5( $file ).'.'.$ext;
 		$file_path = CPIS_DOWNLOAD.'/'.$new_file_name;
 		$rand = rand( 1000, 1000000 );
-		if( file_exists( $file_path ) ) return CPIS_PLUGIN_URL.'/downloads/'.$new_file_name.'?param='.$rand;
+        if( file_exists( $file_path ) ) return CPIS_PLUGIN_URL.'/downloads/'.$new_file_name.'?param='.$rand;
+        
+        if( !cpis_checkMemory( array( $file  ) ) ) return $file;
+        
         $content = file_get_contents( $file );
         if( $content && file_put_contents( $file_path, $content ) ) return CPIS_PLUGIN_URL.'/downloads/'.$new_file_name.'?param='.$rand;
 		return $file;
@@ -28,8 +56,8 @@
 		$dif = ( ( !empty( $options[ 'store' ][ 'download_link' ] ) ) ? $options[ 'store' ][ 'download_link' ] : 3 ) * 86400;
 		$d = @dir( CPIS_DOWNLOAD );
 		while ( false !== ( $entry = $d->read() ) ) {
-            // The cpis-icon.gif file allow to know that htaccess file is supported, so it should not be deleted
-			if($entry != '.' && $entry != '..' && $entry != 'cpis-icon.gif'){
+            // The image-store-icon.png file allow to know that htaccess file is supported, so it should not be deleted
+			if($entry != '.' && $entry != '..' && $entry != 'image-store-icon.png'){
                 if( $entry == '.htaccess' ){
                     if( !$htaccess_accepted ){ // Remove the htaccess if it is not accepted
                         @unlink( CPIS_DOWNLOAD.'/'.$entry );
@@ -122,9 +150,8 @@
 	
     if( isset( $_GET[ 'purchase_id' ] ) ) {
         global $download_links_str;
-        $request = new WP_Http;
-        $response = $request->request( CPIS_PLUGIN_URL.'/downloads/cpis-icon.gif');
-        $htaccess_accepted = ( $response[ 'response' ][ 'code' ] == 200 );
+        $response = wp_remote_get( CPIS_PLUGIN_URL.'/downloads/image-store-icon.png' );
+        $htaccess_accepted = ( !is_wp_error( $response ) && $response[ 'response' ][ 'code' ] == 200 );
         $download_links_str = cpis_generate_downloads();
     }
 ?>

@@ -22,6 +22,10 @@ if(!function_exists('cpis_get_site_url')){
     }
 }
 
+// Global variable used to print the images preview in the website footer
+
+global $cpis_images_preview;
+$cpis_images_preview = '';
 
 // CONST
 define( 'CPIS_PLUGIN_DIR', dirname( __FILE__ ) );
@@ -125,6 +129,7 @@ if( !function_exists( 'cpis_default_options' ) ){
             // Store settings
             'store' => array(
                 'store_url'         => '',
+                'show_search_box'   => true,
                 'show_type_filters' => true,
                 'show_color_filters'=> true,
                 'show_author_filters'   => true,
@@ -409,8 +414,10 @@ if( !function_exists( 'cpis_init' ) ){
         // Create taxonomies
         cpis_init_taxonomies();
         
+        add_action( 'widgets_init', 'cpis_load_widgets' );
+        
         if( !is_admin() ){
-            
+            add_action( 'wp_footer', 'cpis_footer' );
             add_filter('get_pages','cpis_exclude_pages');
             
             if( isset( $_REQUEST ) && isset( $_REQUEST[ 'cpis-action' ] ) ){
@@ -442,6 +449,20 @@ if( !function_exists( 'cpis_init' ) ){
     }
 } // End cpis_ini
 
+if( !function_exists( 'cpis_load_widgets' ) ){
+    function cpis_load_widgets(){
+        register_widget( 'CPISProductWidget' );
+    }
+}        
+
+
+if( !function_exists( 'cpis_footer' ) ){
+    function cpis_footer(){
+        global $cpis_images_preview;
+        print $cpis_images_preview;
+    }
+}
+        
 add_action('admin_init', 'cpis_admin_init', 0);
 if( !function_exists( 'cpis_admin_init' ) ){
     
@@ -523,7 +544,7 @@ if( !function_exists( 'cpis_store_button' ) ){
         global $post;
 			
         if( isset( $post ) && $post->post_type != 'cpis_image' ){
-            print '<a href="javascript:cpis_insert_store();" title="'.__( 'Insert Image Store', CPIS_TEXT_DOMAIN ).'"><img src="'.CPIS_PLUGIN_URL.'/images/image-store-menu-icon.png'.'" alt="'.__( 'Insert Image Store', CPIS_TEXT_DOMAIN ).'" /></a>';
+            print '<a href="javascript:cpis_insert_store();" title="'.__( 'Insert Image Store', CPIS_TEXT_DOMAIN ).'"><img src="'.CPIS_PLUGIN_URL.'/images/image-store-icon.png'.'" alt="'.__( 'Insert Image Store', CPIS_TEXT_DOMAIN ).'" /></a>';
             
             print '<a href="javascript:cpis_insert_product_window();" title="'.__( 'Insert Image Product', CPIS_TEXT_DOMAIN ).'"><img src="'.CPIS_PLUGIN_URL.'/images/image-store-insert-product.png'.'" alt="'.__( 'Insert Image Product', CPIS_TEXT_DOMAIN ).'" /></a>';
         }
@@ -657,6 +678,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
             
             $noptions['store'] = array(
                 'store_url'          => $_POST['cpis_store_url'],
+                'show_search_box' => ( ( isset( $_POST['cpis_show_search_box'] ) ) ? true : false ),
                 'show_color_filters' => ( ( isset( $_POST['cpis_show_color_filters'] ) ) ? true : false ),
                 'show_type_filters'  => ( ( isset( $_POST['cpis_show_type_filters'] ) ) ? true : false ),
                 'show_author_filters'    => ( ( isset( $_POST['cpis_show_author_filters'] ) ) ? true : false ),
@@ -684,7 +706,9 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
             $options = $noptions;
 ?>				
             <div class="updated" style="margin:5px 0;"><strong><?php _e("Settings Updated", CPIS_TEXT_DOMAIN); ?></strong></div>
-<?php				
+<?php		
+            if ( empty( $noptions['paypal']['paypal_email'] ) )
+                print '<div class="updated" style="margin:5px 0;"><strong>'.__("If you want to sell the images, must enter the email associated to your PayPal account.", CPIS_TEXT_DOMAIN).'</strong></div>';
         }
         
         $options = get_option( 'cpis_options' );
@@ -710,24 +734,28 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                             </td>
                         </tr>
                         <tr valign="top">
+                            <th><?php _e( 'Display a search box', CPIS_TEXT_DOMAIN ); ?></th>
+                            <td><input type="checkbox" name="cpis_show_search_box" size="40" value="1" <?php if ( isset( $options[ 'store' ][ 'show_search_box' ] ) && $options[ 'store' ][ 'show_search_box' ] ) echo 'checked'; ?> /></td>
+                        </tr>
+                        <tr valign="top">
                             <th><?php _e( 'Allow filtering by type', CPIS_TEXT_DOMAIN ); ?></th>
-                            <td><input type="checkbox" name="cpis_show_type_filters" size="40" value="1" <?php if ( $options[ 'store' ][ 'show_type_filters' ] ) echo 'checked'; ?> /></td>
+                            <td><input type="checkbox" name="cpis_show_type_filters" size="40" value="1" <?php if ( isset( $options[ 'store' ][ 'show_type_filters' ] ) && $options[ 'store' ][ 'show_type_filters' ] ) echo 'checked'; ?> /></td>
                         </tr>
                         <tr valign="top">
                             <th><?php _e( 'Allow filtering by color', CPIS_TEXT_DOMAIN ); ?></th>
-                            <td><input type="checkbox" name="cpis_show_color_filters" size="40" value="1" <?php if ( $options[ 'store' ][ 'show_color_filters'] ) echo 'checked'; ?> /></td>
+                            <td><input type="checkbox" name="cpis_show_color_filters" size="40" value="1" <?php if ( isset( $options[ 'store' ][ 'show_color_filters'] ) && $options[ 'store' ][ 'show_color_filters'] ) echo 'checked'; ?> /></td>
                         </tr>
                         <tr valign="top">
                             <th><?php _e( 'Allow filtering by author', CPIS_TEXT_DOMAIN ); ?></th>
-                            <td><input type="checkbox" name="cpis_show_author_filters" size="40" value="1" <?php if ( $options[ 'store' ][ 'show_author_filters'] ) echo 'checked'; ?> /></td>
+                            <td><input type="checkbox" name="cpis_show_author_filters" size="40" value="1" <?php if ( isset( $options[ 'store' ][ 'show_author_filters'] ) && $options[ 'store' ][ 'show_author_filters'] ) echo 'checked'; ?> /></td>
                         </tr>
                         <tr valign="top">
                             <th><?php _e( 'Allow filtering by category', CPIS_TEXT_DOMAIN ); ?></th>
-                            <td><input type="checkbox" name="cpis_show_category_filters" size="40" value="1" <?php if ( $options[ 'store' ][ 'show_category_filters'] ) echo 'checked'; ?> /></td>
+                            <td><input type="checkbox" name="cpis_show_category_filters" size="40" value="1" <?php if ( isset( $options[ 'store' ][ 'show_category_filters'] ) && $options[ 'store' ][ 'show_category_filters'] ) echo 'checked'; ?> /></td>
                         </tr>
                         <tr valign="top">
                             <th><?php _e( 'Allow pagination', CPIS_TEXT_DOMAIN ); ?></th>
-                            <td><input type="checkbox" name="cpis_show_pagination" size="40" value="1" <?php if ( $options[ 'store' ][ 'show_pagination' ] ) echo 'checked'; ?> /></td>
+                            <td><input type="checkbox" name="cpis_show_pagination" size="40" value="1" <?php if ( isset( $options[ 'store' ][ 'show_pagination' ] ) && $options[ 'store' ][ 'show_pagination' ] ) echo 'checked'; ?> /></td>
                         </tr>
                         <tr valign="top">
                             <th><?php _e('Items per page', CPIS_TEXT_DOMAIN); ?></th>
@@ -740,14 +768,14 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                         <tr valign="top">
                             <th><?php _e('Show buttons for sharing in social networks', CPIS_TEXT_DOMAIN); ?></th>
                             <td>
-                                <input type="checkbox" name="cpis_social_buttons" <?php echo ( ( $options[ 'store' ][ 'social_buttons' ] ) ? 'CHECKED' : '' ); ?> /><br />
+                                <input type="checkbox" name="cpis_social_buttons" <?php echo ( ( isset( $options[ 'store' ][ 'social_buttons' ] ) && $options[ 'store' ][ 'social_buttons' ] ) ? 'CHECKED' : '' ); ?> /><br />
                                 <em><?php _e('The option enables the buttons for share the pages of songs and collections in social networks', CPIS_TEXT_DOMAIN); ?></em>
                             </td>
                         </tr>
                         <tr valign="top">
                             <th><?php _e('Allow sorting results', CPIS_TEXT_DOMAIN); ?></th>
                             <td>
-                                <input type="checkbox" name="cpis_show_ordering" <?php echo ( ( $options[ 'store' ][ 'show_ordering' ] ) ? 'CHECKED' : '' ); ?> /><br />
+                                <input type="checkbox" name="cpis_show_ordering" <?php echo ( ( isset( $options[ 'store' ][ 'show_ordering' ] ) && $options[ 'store' ][ 'show_ordering' ] ) ? 'CHECKED' : '' ); ?> /><br />
                                 <em><?php _e( 'The option enables the buttons for share the pages of songs and collections in social networks', CPIS_TEXT_DOMAIN ); ?></em>
                             </td>
                         </tr>
@@ -869,12 +897,16 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                     
                         <tr valign="top">        
                         <th scope="row"><?php _e( 'Enable Paypal Sandbox?', CPIS_TEXT_DOMAIN ); ?></th>
-                        <td><input type="checkbox" name="cpis_activate_sandbox" value="1" <?php if ( $options[ 'paypal' ][ 'activate_sandbox' ] ) echo 'checked'; ?> /></td>
+                        <td><input type="checkbox" name="cpis_activate_sandbox" value="1" <?php if ( $options[ 'paypal' ][ 'activate_sandbox' ] ) echo 'checked'; ?> /><br />
+                        <?php _e( 'For testing the selling process, use the PayPal sandbox, but don\'t forget uncheck it in the final website', CPIS_TEXT_DOMAIN ); ?>
+                        </td>
                         </tr>    
                     
                         <tr valign="top">        
                         <th scope="row"><?php _e( 'Paypal email', CPIS_TEXT_DOMAIN ); ?></th>
-                        <td><input type="text" name="cpis_paypal_email" size="40" value="<?php echo esc_attr( $options[ 'paypal' ]['paypal_email'] ); ?>" /></td>
+                        <td><input type="text" name="cpis_paypal_email" size="40" value="<?php echo esc_attr( $options[ 'paypal' ]['paypal_email'] ); ?>" /><br />
+                        <?php _e("If you want to sell the images, must enter the email associated to your PayPal account.", CPIS_TEXT_DOMAIN); ?>
+                        </td>
                         </tr>
                          
                         <tr valign="top">
@@ -1398,6 +1430,21 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
         return $select;
     }
     
+    function _cpis_create_search_filter( $str ){
+        $filter = '';
+        $str = trim( preg_replace( "/\s+/", " ", $str ) );
+        $terms = explode( " ", $str );
+        if( count( $terms ) ){
+            foreach( $terms as $term ){
+                $filter .= "( post_title LIKE '%$term%' OR ";
+                $filter .= "post_content LIKE '%$term%' OR ";
+                $filter .= "post_excerpt LIKE '%$term%' ) AND ";
+            }
+        }
+        
+        return $filter;
+    }
+    
     function cpis_replace_shortcode( $atts, $content, $tag ){
         global $wpdb;
 		
@@ -1414,6 +1461,15 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
         if( !isset( $_SESSION[ 'cpis_page' ] ) ) $_SESSION[ 'cpis_page' ] = 0;
         if( isset( $_REQUEST ) && isset( $_REQUEST[ 'cpis_page' ] ) ){
             $_SESSION[ 'cpis_page' ] = $_REQUEST[ 'cpis_page' ];
+        }
+        
+        // Extract search terms
+        if( isset( $_REQUEST[ 'search_terms' ] ) ){
+            $_SESSION[ 'cpis_search_terms' ] = $_REQUEST[ 'search_terms' ];
+            $_SESSION[ 'cpis_page' ] = 0;
+            $filter = _cpis_create_search_filter( $_REQUEST[ 'search_terms' ] );
+        }else{
+            $filter = "";
         }
         
         // Extract product filters
@@ -1448,7 +1504,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
         // Query clauses 
         $_select 	= "SELECT SQL_CALC_FOUND_ROWS DISTINCT posts.ID";
         $_from 		= "FROM ".$wpdb->prefix."posts as posts,".$wpdb->prefix.CPIS_IMAGE." as posts_data"; 
-        $_where 	= "WHERE posts.ID = posts_data.id AND posts.post_status='publish' AND posts.post_type='cpis_image' ";
+        $_where 	= "WHERE  $filter posts.ID = posts_data.id AND posts.post_status='publish' AND posts.post_type='cpis_image' ";
         $_order_by 	= "ORDER BY ".( ( $_SESSION['cpis_ordering'] != 'purchases' ) ? "posts" : "posts_data" ).".".$_SESSION['cpis_ordering']." ".( ( $_SESSION['cpis_ordering'] == 'post_title' ) ? "ASC" : "DESC" );
         $_limit 	= "";
         
@@ -1538,7 +1594,8 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
         // Create filters and sorting fields
         
         // Create filter section
-        if( $options[ 'store' ][ 'show_type_filters' ] || 
+        if( $options[ 'store' ][ 'show_search_box' ] || 
+            $options[ 'store' ][ 'show_type_filters' ] || 
             $options[ 'store' ][ 'show_color_filters' ] || 
             $options[ 'store' ][ 'show_author_filters' ] ||
             $options[ 'store' ][ 'show_category_filters' ] ||
@@ -1548,6 +1605,16 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                     <div class='cpis-image-store-left'>
                         <form method='post' data-ajax='false'>
                 ";
+            
+            if( $options[ 'store' ][ 'show_search_box' ] ){
+                $left .= "<div class='cpis-column-title'>".__('Search by', CPIS_TEXT_DOMAIN)."</div>";    
+                $left .= "
+                <div class='cpis-filter'>
+                    <input type='search' name='search_terms' placeholder='".__( 'Search...', CPIS_TEXT_DOMAIN )."' value='".( ( isset( $_SESSION[ 'cpis_search_terms' ] ) ) ? $_SESSION[ 'cpis_search_terms' ] : '' )."' style='width:100%;' />
+                </div>
+                ";
+            }    
+    
             $left .= "<div class='cpis-column-title'>".__('Filter by', CPIS_TEXT_DOMAIN)."</div>";
             if( $options[ 'store' ][ 'show_type_filters' ] ){
                 $str = _cpis_create_select_filter( 'filter_by_type', 'All images', 'cpis_type' );
@@ -1625,15 +1692,17 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
             <div class='cpis-image-store-right'>
         ".$header.$top_ten_carousel;
         
-        $width = floor( 100/min( $options[ 'store' ][ 'columns' ], max( count( $results ), 1 ) ) );
+        $width = floor( (100 - 2*( min( $options[ 'store' ][ 'columns' ], max( count( $results ), 1 ) ) -1 ) )/min( $options[ 'store' ][ 'columns' ], max( count( $results ), 1 ) ) ) - 1;
         
         $right .= "<div class='cpis-image-store-items'>";
         $item_counter = 0;
+        $margin = "";
         foreach($results as $result){
-            $right .= "<div style='width:{$width}%;' class='cpis-image-store-item'>".cpis_display_content( $result->ID, 'store', 'return' )."</div>";
+            $right .= "<div style='width:{$width}%;{$margin}' class='cpis-image-store-item'>".cpis_display_content( $result->ID, 'store', 'return' )."</div>";
             $item_counter++;
             if($item_counter % $options[ 'store' ][ 'columns' ] == 0)
                 $right .= "<div style='clear:both;'></div>";
+            $margin = "margin-left:2%;";    
         }
         $right .= "<div style='clear:both;'></div>";
         $right .= "</div>";
@@ -1645,4 +1714,68 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
     }
  } // End cpis_replace_shortcode
  
+ /**
+ * CPISProductWidget Class
+ */
+ class CPISProductWidget extends WP_Widget {
+    
+    /** constructor */
+    function CPISProductWidget() {
+        parent::WP_Widget(false, $name = 'Image Store Product');	        
+    }
+
+    function widget($args, $instance) {		
+        extract( $args );
+        $title = apply_filters('widget_title', $instance['title']);
+        
+        $defaults = array( 'product_id' => '' );
+		$instance_p = wp_parse_args( (array) $instance, $defaults ); 
+        
+        $product_id  = $instance_p[ 'product_id' ];
+        
+        $atts = array( 'id' => $product_id );
+        
+        ?>
+              <?php echo $before_widget; 
+                    if ( $title ) echo $before_title . $title . $after_title; 
+                    $atts[ 'layout' ] = 'widget';
+                    print cpis_replace_product_shortcode($atts);
+              ?>
+              
+              <?php echo $after_widget; ?>
+        <?php
+    }
+
+    function update($new_instance, $old_instance) {				
+        $instance = $old_instance;
+
+		/* Strip tags (if needed) and update the widget settings. */
+		$instance['title'] = strip_tags( $new_instance['title'] );
+		$instance['product_id'] = $new_instance['product_id']*1;
+		
+		return $instance;
+    }
+
+    function form( $instance ) {
+    
+        /* Set up some default widget settings. */
+		$defaults = array( 'title' => '', 'product_id' => '' );
+		$instance = wp_parse_args( (array) $instance, $defaults ); 
+        
+        $title       = $instance[ 'title' ];
+        $product_id  = $instance[ 'product_id' ];
+        
+        
+        ?>
+            <p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?> <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" /></label></p>
+            
+            <p>
+                <label for="<?php echo $this->get_field_id('product_id'); ?>"><?php _e('Enter the product ID:', CPIS_TEXT_DOMAIN); ?><br />
+                    <input class="widefat" id="<?php echo $this->get_field_id( 'product_id' ); ?>" name="<?php echo $this->get_field_name( 'product_id' ); ?>" value="<?php echo $product_id; ?>" />
+                </label>
+            </p>   
+        <?php 
+    }
+  } // clase CPISProductWidget 
+
 ?>
