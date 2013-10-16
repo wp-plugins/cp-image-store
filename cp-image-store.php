@@ -445,6 +445,7 @@ if( !function_exists( 'cpis_init' ) ){
             add_shortcode( 'codepeople-image-store', 'cpis_replace_shortcode' );
             add_shortcode( 'codepeople-image-store-product', 'cpis_replace_product_shortcode' );
             add_filter( 'the_content', 'cpis_the_content' );
+			add_filter( 'the_excerpt', 'cpis_the_excerpt' );
         }
     }
 } // End cpis_ini
@@ -1347,6 +1348,18 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
         return $the_title;
     }
  } // End cpis_the_title
+ 
+ if( !function_exists( 'cpis_the_excerpt' ) ){
+	function cpis_the_excerpt( $the_excerpt ){
+		global $post;
+		if( is_search() && isset( $post ) && $post->post_type == 'cpis_image' ){
+			cpis_save_continue_shopping_url();
+            return cpis_display_content( $post->ID, 'multiple', 'return' );
+		}
+		
+		return $the_excerpt;
+	}
+ } // End cpis_the_excerpt
  
  if( !function_exists( 'cpis_the_content' ) ){
     function cpis_the_content( $the_content  ){
