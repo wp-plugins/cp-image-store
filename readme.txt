@@ -30,6 +30,10 @@ CP Image Store with Slideshow features:
 
 CP Image Store with Slideshow is an online store for the sale of image files: images, predefined pictures, clipart, drawings, vector images. For payment processing, CP Image Store with Slideshow uses PayPal, which is the most widely used payment gateway, safe and easy to use.
 
+[youtube http://www.youtube.com/watch?v=Irf8jxVcUKQ]
+
+Inserting and using the basic "Image Store width Slideshow" plugin.
+
 The premium version of CP Image Store with Slideshow allows to create a preview of your images with a watermark, to protect against malicious users or unauthorized downloads.
 
 The base plugin, available for free from the WordPress Plugin Directory has all the features you need to create an CP Image Store with Slideshow on your website.
@@ -43,9 +47,16 @@ The base plugin, available for free from the WordPress Plugin Directory has all 
 *   Allows to set discount coupons to promote sales from specific sources
 *   Allows to group all purchased items in one compacted download
 
+[youtube http://www.youtube.com/watch?v=92PMxQPeVFM]
+
+Inserting and using the premium version of "Image Store width Slideshow" plugin.
 
 If you want more information about this plugin or another one don't doubt to visit my website:
 [http://wordpress.dwbooster.com](http://wordpress.dwbooster.com "CodePeople WordPress Repository")
+
+[youtube http://www.youtube.com/watch?v=HfFGGsCBNp8]
+
+Inserting a products list, and products, in pages or sidebars of website (only available in the premium version of plugin).
 
 == Installation ==
 
@@ -233,7 +244,11 @@ A: The current version of plugin allows only PayPal as payment gateway.
 
 = Q: Why after press the "Buy Now" button the page is not redirected to PayPal? =
 
-A: Please, go to the settings page of Image Store, and be sure that email associated to the PayPal account was entered. If the email associated to the PayPal account was typed, go to the product's page, and be sure that image's price is nonzero.
+A: Please, go to the settings page of Image Store, and be sure that email associated to the PayPal account was entered. If the email associated to the PayPal account was typed, go to the product's page, and be sure that image's price is non zero.
+
+= Q: Why I can't get the purchased images as a zip file? =
+
+A: To use this feature be sure the libraries to create ZIP files are available in the PHP script installed in your web server. Furthermore, if the customers bought multiple files at same time, and the sum of size of all files purchased is bigger than memory assigned to the PHP, then is not possible to create the zip file.
 
 == Screenshots ==
 1. Image Store
