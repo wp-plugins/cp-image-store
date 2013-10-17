@@ -468,28 +468,33 @@ add_action('admin_init', 'cpis_admin_init', 0);
 if( !function_exists( 'cpis_admin_init' ) ){
     
     function _cpis_create_pages( $slug, $title ){
-        $page = get_page_by_path( $slug ); 
-        if( is_admin() ){
-            if( is_null( $page ) ){
-                if( wp_insert_post(
-                        array(
-                            'comment_status' => 'closed',
-                            'post_name' => $slug,
-                            'post_title' => __( $title, CPIS_TEXT_DOMAIN ),
-                            'post_status' => 'publish',
-                            'post_type' => 'page'
-                        )
-                    )    
-                ){
-                    $page = get_page_by_path( $slug ); 
-                }
-            }else{
-                $page->post_status = 'publish';
-                wp_update_post( $page );
-            }
-        }
-        return ( !is_null( $page ) ) ? get_permalink($page->ID) : CPIS_H_URL;
-    }
+		if( session_id() == "" ) session_start();
+		if( isset( $_SESSION[ $slug ] ) ) return $_SESSION[ $slug ];
+		
+		$page = get_page_by_path( $slug ); 
+		if( is_null( $page ) ){
+			if( is_admin() ){
+				if( false != ($id = wp_insert_post(
+							array(
+								'comment_status' => 'closed',
+								'post_name' => $slug,
+								'post_title' => __( $title, CPIS_TEXT_DOMAIN ),
+								'post_status' => 'publish',
+								'post_type' => 'page'
+							)
+						)
+					)    
+				){
+					$_SESSION[ $slug ] =  get_permalink($id);
+				}
+			}    
+		}else{
+			$_SESSION[ $slug ] =  get_permalink($page->ID);
+		}	
+		
+		$_SESSION[ $slug ] = ( isset( $_SESSION[ $slug ] ) ) ? $_SESSION[ $slug ] : CPIS_H_URL;
+		return $_SESSION[ $slug ];
+	}
     
     function cpis_admin_init(){
         
