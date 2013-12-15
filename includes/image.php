@@ -37,10 +37,10 @@ if( !function_exists( 'cpis_watermarkImage' ) ){
                     
                     break;
                 case "gif":
-                    imagegif ($image_p, $DestinationFile, 100);
+                    imagegif ($image_p, $DestinationFile);
                     break;
                 case "png":
-                    imagepng ($image_p, $DestinationFile, 100);
+                    imagepng ($image_p, $DestinationFile, 0);
                     break;
             }
             
