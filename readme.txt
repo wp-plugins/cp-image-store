@@ -3,7 +3,7 @@ Contributors: codepeople
 Donate link: http://wordpress.dwbooster.com/content-tools/cp-image-store
 Tags:sell pictures,gallery,galleries,image store,paypal,photo store,slideshow,photo gallery,photography,photos,sell digital print,sell images,sell photo,sell photos,photo selling,images,image,photos,pictures,clipart,vector,e-commerce,ecommerce,facebook,google,google+,html5,carousel,shop,social,social network,store,twitter
 Requires at least: 3.0.5
-Tested up to: 3.7
+Tested up to: 3.8
 Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -18,15 +18,16 @@ CP Image Store with Slideshow features:
     § Allows selling various resolution versions of the image at tiered prices
     § Multiple online store settings:display a search box, filter by author, 
       color scheme, image type and categories. Set the number of columns in the 
-      music store. Pagination, and sorting of results by title, popularity and 
+      image store. Pagination, and sorting of results by title, popularity and 
       publication date
     § Associate various features to pictures: author, type of image, 
       color scheme, and categories
     § Allows to insert a particular image in posts or pages, and as widget 
       on website's sidebars
-    § Allows sharing songs in social networks (ex: Facebook, Twitter, Google+)
+    § Allows sharing image pages in social networks (ex: Facebook, Twitter, Google+)
     § Shows a carousel with the top 10 images obtained with the filter values
-    § Includes a module to track sales statistics
+    § Includes a module to track sales statistics.
+	  Displays animated charts for specific sales reports
 
 CP Image Store with Slideshow is an online store for the sale of image files: images, predefined pictures, clipart, drawings, vector images. For payment processing, CP Image Store with Slideshow uses PayPal, which is the most widely used payment gateway, safe and easy to use.
 
@@ -47,6 +48,12 @@ The base plugin, available for free from the WordPress Plugin Directory has all 
 *   Allows to set discount coupons to promote sales from specific sources
 *   Allows to group all purchased items in one compacted download
 
+**Demo of Premium Version of Plugin**
+
+[http://www.dreamweaverdownloads.com/demos/image-store/wp-login.php](http://www.dreamweaverdownloads.com/demos/image-store/wp-login.php "Click to access the administration area demo")
+
+[http://www.dreamweaverdownloads.com/demos/image-store/](http://www.dreamweaverdownloads.com/demos/image-store/ "Click to access the Image Store")
+
 [youtube http://www.youtube.com/watch?v=92PMxQPeVFM]
 
 Inserting and using the premium version of "Image Store width Slideshow" plugin.
@@ -57,6 +64,15 @@ If you want more information about this plugin or another one don't doubt to vis
 [youtube http://www.youtube.com/watch?v=HfFGGsCBNp8]
 
 Inserting a products list, and products, in pages or sidebars of website (only available in the premium version of plugin).
+
+**Are safe the downloads links?**
+
+The security in the access to products files is determined in different ways. 
+
+*	The products files can't be accessed directly. The purchased files are stored in a special directory called downloads, the downloads directory includes a .htaccess file that forbid the access from browser. The files can be accessed only through a server side script that validates the purchase.  
+*	The Store determines the validity of  download links based in two options, available in the settings page of plugin.
+It is possible define a time period, in days, where a download link is considered valid. If a user tries to download a purchased product, the Store checks the date of purchasing.
+The  Store may be configured to request the email address used in the purchasing to check the validity of download link.
 
 == Installation ==
 
@@ -124,13 +140,14 @@ This section defines the options for the payment gateway.
 *   PayPal Language: Language in which PayPal will be loaded.
 *   Use shopping cart: Activate the shopping cart to allow purchase of several products at once.
 *   Download link valid for: Enter the number of days during which the generated download link will be valid;  past this number of days the download link will expire.
+*   Use safe downloads: Requires that the customer type the email address used to purchase the products before download them.
 *   Pack all Purchased image files as a single ZIP file: You can group all products purchased in one compacted file.
 
 **Discount Settings (Available only in the Premium version)**
 
 This section allows to set up discounts in your CP Image Store with Slideshow.
 
-*   Display discount promotions in the music store page: Allows to display the text of the promotion on the store page.
+*   Display discount promotions in the image store page: Allows to display the text of the promotion on the store page.
 *   Scheduled Discounts: List of defined discounts. Here you can edit or delete existing discounts.
 *   Percent of discount: Percentage of the price that will be discounted.
 *   Valid for sales over than: The discount will apply to sales where the total amount exceeds the number entered in this field.
@@ -209,6 +226,8 @@ When a sale takes place, a notification is emailed to the CP Image Store with Sl
 The reports section allows to filter sales  by period. By default, current day's sales are shown, but it also displays sales' totals for the selected period, and the currency in which items were sold.
 
 You can delete a sales report from the list of sales. This may be needed in case of a refund, to make sure that your sales statistics reflect the real situation with the updated figures.
+
+The statistics module allow to display animated charts for specific reports.
 
 == Frequently Asked Questions ==
 

@@ -24,7 +24,8 @@ if(!function_exists('cpis_get_site_url')){
 
 // Global variable used to print the images preview in the website footer
 
-global $cpis_images_preview;
+global $cpis_images_preview, $cpis_errors;
+$cpis_errors = array();
 $cpis_images_preview = '';
 
 // CONST
@@ -36,7 +37,7 @@ define( 'CPIS_IMAGE_STORE_SLUG', 'image-store-menu' );
 define( 'CPIS_IMAGES_URL',  CPIS_PLUGIN_URL.'/images' );
 define( 'CPIS_TEXT_DOMAIN',  'cpis-text-domain' );
 define( 'CPIS_SC_EXPIRE', 3); // Time for shopping cart expiration, default 3 days
-
+define( 'CPIS_SAFE_DOWNLOAD', false);
 
 // TABLE NAMES
 define( 'CPIS_IMAGE', 'cpis_image');
@@ -419,7 +420,6 @@ if( !function_exists( 'cpis_init' ) ){
         if( !is_admin() ){
             add_action( 'wp_footer', 'cpis_footer' );
             add_filter('get_pages','cpis_exclude_pages');
-            
             if( isset( $_REQUEST ) && isset( $_REQUEST[ 'cpis-action' ] ) ){
                 $options = get_option( 'cpis_options' );
                 switch( strtolower( $_REQUEST[ 'cpis-action' ] ) ){
@@ -433,12 +433,8 @@ if( !function_exists( 'cpis_init' ) ){
                         exit;
                     break;
                     
-                    case 'download':
-                        if( !empty( $_REQUEST[ 'purchase_id' ] ) ){
-                            add_filter( 'the_title', 'cpis_the_title' );
-                        }else{
-                            exit;
-                        }    
+                    case 'f-download':
+                        cpis_download_file();
                     break;
                 }
             }
@@ -497,13 +493,40 @@ if( !function_exists( 'cpis_admin_init' ) ){
 	}
     
     function cpis_admin_init(){
-        
+		global $wpdb;
+		
         $plugin = plugin_basename(__FILE__);
         add_filter("plugin_action_links_".$plugin, 'cpis_customAdjustmentsLink');
         
         // Create database
         cpis_create_db();
-        
+		
+		if( isset( $_REQUEST[ 'cpis-action' ] ) && $_REQUEST[ 'cpis-action' ] == 'paypal-data' ){
+			if( isset( $_REQUEST[ 'data' ] ) && isset( $_REQUEST[ 'from' ] ) && isset( $_REQUEST[ 'to' ] ) ){
+				$where = 'DATEDIFF(date, "'.$_REQUEST[ 'from' ].'")>=0 AND DATEDIFF(date, "'.$_REQUEST[ 'to' ].'")<=0';
+				switch( $_REQUEST[ 'data' ] ){
+					case 'residence_country':
+						print cpis_getFromPayPalData( array( 'residence_country' => 'residence_country'), 'COUNT(*) AS count', '', $where, array( 'residence_country' ), array( 'count' => 'DESC' ) );
+					break;	
+					case 'mc_currency':
+						print cpis_getFromPayPalData( array( 'mc_currency' => 'mc_currency'), 'SUM(amount) AS sum', '', $where, array( 'mc_currency' ), array( 'sum' => 'DESC' ) );
+					break;	
+					case 'product_name':
+						$from   = $wpdb->posts.' AS posts,'.$wpdb->prefix.CPIS_IMAGE_FILE.' AS image_file';
+						$where .= ' AND product_id = image_file.id_file AND posts.ID = image_file.id_image';
+						
+						$json =  cpis_getFromPayPalData( array( 'mc_currency' => 'mc_currency'), 'SUM(amount) AS sum, post_title', $from, $where, array( 'product_id', 'mc_currency' ) );
+						$obj = json_decode( $json );
+						foreach( $obj as $key => $value){
+							$obj[ $key ]->post_title .= ' ['.$value->mc_currency.']';
+						}
+						print json_encode( $obj );
+					break;
+				}
+			}
+			exit;
+		}
+            
         // Init the metaboxs for images
 		add_meta_box( 'cpis_image_metabox', __( "Image's data", CPIS_TEXT_DOMAIN ), 'cpis_image_metabox', 'cpis_image', 'normal', 'high' );
         
@@ -707,8 +730,10 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                 'notification_payer'    => $_POST['cpis_notification_payer'],
                 'notification_seller'   => $_POST['cpis_notification_seller']
             );
-            
+				
             update_option( 'cpis_options', $noptions );
+			update_option( 'cpis_safe_download', ( ( isset( $_POST[ 'cpis_safe_download' ] ) ) ? true : false ) );
+			
             $options = $noptions;
 ?>				
             <div class="updated" style="margin:5px 0;"><strong><?php _e("Settings Updated", CPIS_TEXT_DOMAIN); ?></strong></div>
@@ -721,6 +746,8 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
 ?>        
         <p style="border:1px solid #E6DB55;margin-bottom:10px;padding:5px;background-color: #FFFFE0;">
             For reporting an issue or to request a customization, <a href="http://wordpress.dwbooster.com/contact-us" target="_blank">CLICK HERE</a>
+			<br />If you want test the premium version of Image Store go to the following links:<br/> <a href="http://www.dreamweaverdownloads.com/demos/image-store/wp-login.php" target="_blank">Administration area: Click to access the administration area demo</a><br/> 
+			<a href="http://www.dreamweaverdownloads.com/demos/image-store/" target="_blank">Public page: Click to access the Store Page</a>
         </p>
 
         <form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
@@ -942,7 +969,16 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                         <td><input type="text" name="cpis_download_link" value="<?php echo esc_attr( $options[ 'store' ][ 'download_link' ] ); ?>" /> <?php _e( 'day(s)', CPIS_TEXT_DOMAIN )?></td>
                         </tr>  
                         
-                        <tr valign="top">
+                        <<tr valign="top">
+                        <th scope="row"><?php _e( 'Use safe downloads', CPIS_TEXT_DOMAIN ); ?></th>
+                        <td><input type="checkbox" name="cpis_safe_download" 
+						<?php 
+						$cpis_safe_download = get_option( 'cpis_safe_download' );
+						if( !empty( $cpis_safe_download ) && $cpis_safe_download  ) echo 'CHECKED'; 
+						?> /></td>
+                        </tr>  
+                        
+                        tr valign="top">
                         <th scope="row"><?php _e( 'Pack all purchased audio files as a single ZIP file', CPIS_TEXT_DOMAIN ); ?></th>
                         <td><input type="checkbox" disabled >
                         <?php
@@ -1143,7 +1179,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                     foreach( $months_list as $month => $name ) print '<option value="'.$month.'"'.( ( $from_month == $month ) ? ' SELECTED' : '' ).'>'.$name.'</option>';
                 ?>
                 </select>
-                <input type="text" name="form_year" value="<?php print $from_year; ?>" />
+                <input type="text" name="from_year" value="<?php print $from_year; ?>" />
                 
                 <label><?php _e( 'To: ', CPIS_TEXT_DOMAIN ); ?></label>
                 <select name="to_day">
@@ -1156,7 +1192,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                     foreach( $months_list as $month => $name ) print '<option value="'.$month.'"'.( ( $to_month == $month ) ? ' SELECTED' : '' ).'>'.$name.'</option>';
                 ?>
                 </select>
-                <input type="text" name="to_year" value="<?php print $from_year; ?>" />
+                <input type="text" name="to_year" value="<?php print $to_year; ?>" />
                 
                 <input type="submit" value="<?php _e('Search', CPIS_TEXT_DOMAIN); ?>" class="button-primary" />
             </div>
@@ -1165,6 +1201,23 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
         <div class="postbox">
             <h3 class='hndle' style="padding:5px;"><span><?php _e( 'Store sales report', CPIS_TEXT_DOMAIN ); ?></span></h3>
             <div class="inside">
+				<?php 
+					if(count($purchase_list)){	
+						print '
+							<div>
+								<label style="margin-right: 20px;" ><input type="checkbox" onclick="cpis_load_report(this, \'sales_by_country\', \''.__( 'Sales by country', CPIS_TEXT_DOMAIN ).'\', \'residence_country\', \'Pie\', \'residence_country\', \'count\');" /> '.__( 'Sales by country', CPIS_TEXT_DOMAIN ).'</label>
+								<label style="margin-right: 20px;" ><input type="checkbox" onclick="cpis_load_report(this, \'sales_by_currency\', \''.__( 'Sales by currency', CPIS_TEXT_DOMAIN ).'\', \'mc_currency\', \'Bar\', \'mc_currency\', \'sum\');" /> '.__( 'Sales by currency', CPIS_TEXT_DOMAIN ).'</label>
+								<label><input type="checkbox" onclick="cpis_load_report(this, \'sales_by_product\', \''.__( 'Sales by product', CPIS_TEXT_DOMAIN ).'\', \'product_name\', \'Bar\', \'post_title\', \'sum\');" /> '.__( 'Sales by product', CPIS_TEXT_DOMAIN ).'</label>
+							</div>';
+					}
+				?>
+						    
+				<div id="charts_content" >
+					<div id="sales_by_country"></div>
+					<div id="sales_by_currency"></div>
+					<div id="sales_by_product"></div>
+				</div>
+							
                 <table class="form-table" style="border-bottom:1px solid #CCC;margin-bottom:10px;">
                     <THEAD>
                         <TR style="border-bottom:1px solid #CCC;">
@@ -1174,6 +1227,10 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                     <TBODY>
                     <?php
                     $totals = array( 'UNDEFINED' => 0 );
+					
+					$dlurl = _cpis_create_pages( 'cpis-download-page', 'Download Page' );
+					$dlurl .= ( ( strpos( $dlurl, '?' ) === false ) ? '?' : '&' ).'cpis-action=download&purchase_id=';
+			
                     if( count( $purchase_list ) ){	
                         foreach( $purchase_list as $purchase ){
                             
@@ -1191,7 +1248,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                                     <TD>'.$purchase->email.'</TD>
                                     <TD>'.$purchase->amount.'</TD>
                                     <TD>'.$currency.'</TD>
-                                    <TD><a href="'.CPIS_H_URL.'?cpis-action=download&purchase_id='.$purchase->purchase_id.'" target="_blank">Download Link</a></TD>
+                                    <TD><a href="'.$dlurl.$purchase->purchase_id.'" target="_blank">Download Link</a></TD>
                                     <TD>'.$purchase->note.'</TD>
                                     <TD><input type="button" class="button-primary" onclick="cpis_delete_purchase('.$purchase->id.');" value="Delete"></TD>
                                 </TR>
@@ -1260,7 +1317,10 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
         }else if(
             $hook == 'image-store_page_image-store-menu-reports'
         ){
+			wp_enqueue_style('cpis-admin-style', CPIS_PLUGIN_URL.'/css/admin.css');
+			wp_enqueue_script('cpis-admin-script-chart', CPIS_PLUGIN_URL.'/js/Chart.min.js', array('jquery'), null, true);
             wp_enqueue_script('cpis-admin-script', CPIS_PLUGIN_URL.'/js/admin.js', array('jquery'), null, true);
+			wp_localize_script('cpis-admin-script', 'cpis_global', array( 'aurl' => admin_url() ));
         }else if( isset( $post ) ){
             
             wp_enqueue_script('jquery-ui-core');
@@ -1338,22 +1398,6 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
      }
  } // End cpis_removemediabuttons
  
- if( !function_exists( 'cpis_the_title' ) ){
-    function cpis_the_title( $the_title ){
-        global $id;
-        
-        if( in_the_loop() && isset( $id ) && isset( $_REQUEST ) && isset( $_REQUEST[ 'cpis-action' ] ) ){
-            switch( strtolower( $_REQUEST[ 'cpis-action' ] ) ){
-                case 'download':
-                    return 'Download Page';
-                break;
-            }
-        }
-        
-        return $the_title;
-    }
- } // End cpis_the_title
- 
  if( !function_exists( 'cpis_the_excerpt' ) ){
 	function cpis_the_excerpt( $the_excerpt ){
 		global $post;
@@ -1376,8 +1420,37 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
             if( isset( $_REQUEST ) && isset( $_REQUEST[ 'cpis-action' ] ) ){
                 switch( strtolower( $_REQUEST[ 'cpis-action' ] ) ){
                     case 'download':
+						global $cpis_errors;
+					
                         include CPIS_PLUGIN_DIR.'/includes/download.php';
-                        return $download_links_str;
+						if( empty( $cpis_errors ) ){
+							$the_content .= '<div>'.$download_links_str.'</div>';
+						}else{
+							$error = ( !empty( $_REQUEST[ 'error_mssg' ] ) ) ? $_REQUEST[ 'error_mssg' ] : '';
+							
+							if( !empty( $_SESSION[ 'cpis_user_email' ] ) ){
+								$error .= '<li>'.implode( '</li><li>', $cpis_errors ).'</li>';
+							}
+							
+							$the_content .= ( !empty( $error ) )  ? '<div class="cpis-error-mssg"><ul>'.$error.'</ul></div>' : '';
+
+							if( get_option( 'cpis_safe_download', CPIS_SAFE_DOWNLOAD ) ){
+								$dlurl = _cpis_create_pages( 'cpis-download-page', 'Download Page' );
+								$dlurl .= ( ( strpos( $dlurl, '?' ) === false ) ? '?' : '&' ).'cpis-action=download'.( ( isset( $_REQUEST[ 'purchase_id' ] ) ) ? '&purchase_id='.$_REQUEST[ 'purchase_id' ] : '' );	
+								$the_content .= '
+									<form action="'.$dlurl.'" method="POST" >
+										<div style="text-align:center;">
+											<div>
+												'.__( 'Type the email address used to purchase our products', CPIS_TEXT_DOMAIN ).'
+											</div>
+											<div>
+												<input type="text" name="cpis_user_email" /> <input type="submit" value="Get Products" />
+											</div>	
+										</div>
+									</form>
+								';
+							}	
+						}
                     break;
                 }
             }
@@ -1728,9 +1801,158 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
         // End right column
         $right .= $page_links."</div>";
         
-        return $left.$right."<div style='clear:both;' ></div>";
+        return "<div class='cpis-image-store'>".$left.$right."<div style='clear:both;' ></div></div>";
     }
  } // End cpis_replace_shortcode
+ 
+ if( !function_exists( 'cpis_setError' ) ){
+    function cpis_setError( $error_text ){
+        global $cpis_errors;
+        $cpis_errors[] = __( $error_text, CPIS_TEXT_DOMAIN );
+    }
+ } // End cpis_setError
+ 
+ if( !function_exists( 'cpis_check_download_permissions' ) ){
+	function cpis_check_download_permissions(){
+
+		global $wpdb;
+		
+		// If not session, create it
+		if( session_id() == "" ) session_start();
+
+		// Check if download for free or the user is an admin
+		if(	!empty( $_SESSION[ 'cpis_download_for_free' ] ) || current_user_can( 'manage_options' ) ) return true;
+
+		// and check the existence of a parameter with the purchase_id
+		if( empty( $_REQUEST[ 'purchase_id' ] ) ){ 
+			cpis_setError( 'The purchase id is required' );
+			return false;
+		}	
+
+		if( get_option( 'cpis_safe_download', CPIS_SAFE_DOWNLOAD ) ){
+			
+			if( session_id() == "" ) session_start();
+			if( !empty( $_REQUEST[ 'cpis_user_email' ] ) ) $_SESSION[ 'cpis_user_email' ] =  $_REQUEST[ 'cpis_user_email' ];
+			
+			// Check if the user has typed the email used to purchase the product 
+			if( empty( $_SESSION[ 'cpis_user_email' ] ) ){ 
+				$dlurl = _cpis_create_pages( 'cpis-download-page', 'Download Page' );
+				$dlurl .= ( ( strpos( $dlurl, '?' ) === false ) ? '?' : '&' ).'cpis-action=download&purchase_id='.$_REQUEST[ 'purchase_id' ];
+				cpis_setError( "Please, go to the download page, and enter the email address used in products purchasing" );
+				return false;
+			}	
+			$days = $wpdb->get_var( $wpdb->prepare( 'SELECT DATEDIFF(NOW(), date) FROM '.$wpdb->prefix.CPIS_PURCHASE.' WHERE purchase_id=%s AND email=%s', array( $_REQUEST[ 'purchase_id' ], $_SESSION[ 'cpis_user_email' ] ) ) );
+		}else{
+			$days = $wpdb->get_var( $wpdb->prepare( 'SELECT DATEDIFF(NOW(), date) FROM '.$wpdb->prefix.CPIS_PURCHASE.' WHERE purchase_id=%s', array( $_REQUEST[ 'purchase_id' ] ) ) );
+		}
+		
+		global $options;
+		$valid_download = ( !empty( $options[ 'store' ][ 'download_link' ] ) ) ? $options[ 'store' ][ 'download_link' ] : 3 ;
+
+		if( is_null( $days ) ){
+			cpis_setError( 'There is no product associated with the entered data' );
+			return false;
+		}elseif( $valid_download < $days ){ 
+			cpis_setError( 'The download link has expired, please contact to the vendor' );
+			return false;	
+		}
+
+		return true;
+	} 
+ } // End cpis_check_download_permissions
+
+if( !function_exists( 'cpis_download_file' ) ){
+	function cpis_download_file(){
+		global $wpdb, $cpis_errors;
+		
+		if( isset( $_REQUEST[ 'f' ] ) && cpis_check_download_permissions() ){
+			header( 'Content-Disposition: attachment; filename="'.$_REQUEST[ 'f' ].'"' );
+			readfile( CPIS_DOWNLOAD.'/'.$_REQUEST[ 'f' ] );
+		}else{
+			$dlurl = _cpis_create_pages( 'cpis-download-page', 'Download Page' );
+			$dlurl .= ( ( strpos( $dlurl, '?' ) === false ) ? '?' : '&' ).'cpis-action=download&error_mssg='.urlencode( '<li>'.implode( '</li><li>', $cpis_errors ).'</li>' ).( ( !empty( $_REQUEST[ 'purchase_id' ] ) ) ? '&purchase_id='.$_REQUEST[ 'purchase_id' ] : '' );
+			header( 'location: '.$dlurl );
+		}
+		exit;
+	} 
+} // End cpis_download_file
+ if( !function_exists( 'cpis_download_file' ) ){
+	function cpis_download_file(){
+		global $wpdb, $cpis_errors;
+		
+		if( isset( $_REQUEST[ 'f' ] ) && cpis_check_download_permissions() ){
+			header( 'Content-Disposition: attachment; filename="'.$_REQUEST[ 'f' ].'"' );
+			readfile( CPIS_DOWNLOAD.'/'.$_REQUEST[ 'f' ] );
+		}else{
+			$dlurl = _cpis_create_pages( 'cpis-download-page', 'Download Page' );
+			$dlurl .= ( ( strpos( $dlurl, '?' ) === false ) ? '?' : '&' ).'cpis-action=download&error_mssg='.urlencode( '<li>'.implode( '</li><li>', $cpis_errors ).'</li>' ).( ( !empty( $_REQUEST[ 'purchase_id' ] ) ) ? '&purchase_id='.$_REQUEST[ 'purchase_id' ] : '' );
+			header( 'location: '.$dlurl );
+		}
+		
+		exit;
+	} 
+ } // End cpis_download_file
+ 
+ 
+// From PayPal Data RAW
+/*
+  $fieldsArr, array( 'fields name' => 'alias', ... )
+  $selectAdd, used if is required complete the results like: COUNT(*) as count
+  $groupBy, array( 'alias', ... ) the alias used in the $fieldsArr parameter
+  $orderBy, array( 'alias' => 'direction', ... ) the alias used in the $fieldsArr parameter, direction = ASC or DESC
+*/
+if( !function_exists( 'cpis_getFromPayPalData' ) ){
+	function cpis_getFromPayPalData( $fieldsArr, $selectAdd = '', $from = '', $where = '', $groupBy = array(), $orderBy = array(), $returnAs = 'json' ){
+		global $wpdb;
+		
+		$_select = 'SELECT ';
+		$_from = 'FROM '.$wpdb->prefix.CPIS_PURCHASE.( ( !empty( $from ) ) ? ','.$from : '' );
+		$_where = 'WHERE '.( ( !empty( $where ) ) ? $where : 1 );
+		$_groupBy = ( !empty( $groupBy ) ) ? 'GROUP BY ' : '';
+		$_orderBy = ( !empty( $orderBy ) ) ? 'ORDER BY ' : '';
+		
+		$separator = '';
+		foreach( $fieldsArr as $key => $value ){
+			$length = strlen( $key )+1;
+			$_select .= $separator.' 
+							SUBSTRING(paypal_data, 
+							LOCATE("'.$key.'", paypal_data)+'.$length.', 
+							LOCATE("\r\n", paypal_data, LOCATE("'.$key.'", paypal_data))-(LOCATE("'.$key.'", paypal_data)+'.$length.')) AS '.$value; 
+			$separator = ',';
+		}
+		
+		if( !empty( $selectAdd ) ){
+			$_select .= $separator.$selectAdd; 
+		}
+		
+		$separator = '';
+		foreach( $groupBy as $value ){
+			$_groupBy .= $separator.$value;
+			$separator = ',';
+		}
+		
+		$separator = '';
+		foreach( $orderBy as $key => $value ){
+			$_orderBy .= $separator.$key.' '.$value;
+			$separator = ',';
+		}
+		
+		$query = $_select.' '.$_from.' '.$_where.' '.$_groupBy.' '.$_orderBy;
+
+		$result = $wpdb->get_results( $query );
+		
+		if( !empty( $result ) ){
+			switch( $returnAs ){
+				case 'json':
+					return json_encode( $result );
+				break;
+				default:
+					return $result;
+				break;
+			}
+		}
+	} 
+} // End cpis_getFromPayPalData
  
  /**
  * CPISProductWidget Class
