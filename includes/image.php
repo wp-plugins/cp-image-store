@@ -57,7 +57,8 @@ if( !function_exists( 'cpis_image_columns' ) ){
     function cpis_image_columns( $columns ){
         return array(
 				'cb'	        => '<input type="checkbox" />',
-                'preview'       => __( 'Preview', CPIS_TEXT_DOMAIN ),
+                'id'       		=> __( 'Image Id', CPIS_TEXT_DOMAIN ),
+				'preview'       => __( 'Preview', CPIS_TEXT_DOMAIN ),
 				'title'	        => __( 'Image Name', CPIS_TEXT_DOMAIN ),
 				'author'        => __( 'Post Author', CPIS_TEXT_DOMAIN ),
 				'image_author'  => __( 'Image Author', CPIS_TEXT_DOMAIN ),
@@ -88,6 +89,10 @@ if( !function_exists( 'cpis_image_columns_data' ) ){
             case "purchases":
                 $purchases = $wpdb->get_var( $wpdb->prepare( "SELECT purchases FROM ".$wpdb->prefix.CPIS_IMAGE." WHERE id=%d", $post->ID ) );
                 echo ( !empty( $purchases ) ) ? $purchases : 0;
+            break;
+            
+            case "id":
+                echo $post->ID;
             break;
             
             case "color":
