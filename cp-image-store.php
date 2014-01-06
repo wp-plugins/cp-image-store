@@ -1841,9 +1841,9 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
 				cpis_setError( "Please, go to the download page, and enter the email address used in products purchasing" );
 				return false;
 			}	
-			$days = $wpdb->get_var( $wpdb->prepare( 'SELECT DATEDIFF(NOW(), date) FROM '.$wpdb->prefix.CPIS_PURCHASE.' WHERE purchase_id=%s AND email=%s', array( $_REQUEST[ 'purchase_id' ], $_SESSION[ 'cpis_user_email' ] ) ) );
+			$days = $wpdb->get_var( $wpdb->prepare( 'SELECT DATEDIFF(NOW(), date) FROM '.$wpdb->prefix.CPIS_PURCHASE.' WHERE purchase_id=%s AND email=%s ORDER BY date DESC', array( $_REQUEST[ 'purchase_id' ], $_SESSION[ 'cpis_user_email' ] ) ) );
 		}else{
-			$days = $wpdb->get_var( $wpdb->prepare( 'SELECT DATEDIFF(NOW(), date) FROM '.$wpdb->prefix.CPIS_PURCHASE.' WHERE purchase_id=%s', array( $_REQUEST[ 'purchase_id' ] ) ) );
+			$days = $wpdb->get_var( $wpdb->prepare( 'SELECT DATEDIFF(NOW(), date) FROM '.$wpdb->prefix.CPIS_PURCHASE.' WHERE purchase_id=%s ORDER BY date DESC', array( $_REQUEST[ 'purchase_id' ] ) ) );
 		}
 		
 		global $options;
