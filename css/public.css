@@ -15,7 +15,7 @@
 .cpis-image-store-pagination{ text-align: right; margin-top: 20px;}
 .cpis-image-store-pagination .page-selected{ padding: 3px 6px; display:inline-block; border: 1px solid #E9E9E9;margin-right:2px; }
 .cpis-image-store-pagination .page-link{ padding: 3px 6px; display:inline-block; background: #E9E9E9; border: 1px solid #E9E9E9; text-decoration: none;margin-right:2px; }
-.cpis-image-data{ position: absolute; background: #2A3333; border: 1px solid #2A3333; height: auto; -webkit-box-shadow:  0px 0px 2px 3px rgba(0, 0, 0, 0.5); box-shadow:  0px 0px 2px 3px rgba(0, 0, 0, 0.5); display: none; z-index:9999; }
+.cpis-image-data{ position: absolute; background: #2A3333; border: 1px solid #2A3333; height: auto; -webkit-box-shadow:  0px 0px 2px 3px rgba(0, 0, 0, 0.5); box-shadow:  0px 0px 2px 3px rgba(0, 0, 0, 0.5); display: none; z-index:9999;}
 #cpis_table{padding: 0; margin: 0; border: 0;}
 #cpis_table td{padding: 10px; margin: 0; border: 0; vertical-align: top;}
 
@@ -81,3 +81,12 @@
 
 .cpis-error-mssg{ border: 1px solid #FF0000; color: #FF0000; text-align:center; width:100%; }
 .cpis-error-mssg ul{ list-style:none; }
+
+@media screen and (max-width:600px) {
+	.cpis-image-store{min-width:0;padding: 0 10px;}
+	.cpis-image-store-left{max-width:none;width:100%;clear:both;}
+	.cpis-image-store-right{width:100%;margin-left:0;}
+	.cpis-single-image-data .cpis-image-left{ width:100%; clear:both; }
+	.cpis-single-image-data .cpis-image-right,
+	.cpis-single-image-data .cpis-image-right.with-left{ width: 100%;padding:0;}
+}

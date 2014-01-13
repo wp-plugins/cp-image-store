@@ -24,7 +24,11 @@
         $( '.cpis-image-data' ).hide();
         
         var d = $( '#cpis_image'+id );
-        
+        if( $( window ).width() < 600 )
+		{
+			return;
+		}
+		
         e = $( e );
         setTimeout(
             function(){
