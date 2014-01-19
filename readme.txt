@@ -50,9 +50,9 @@ The base plugin, available for free from the WordPress Plugin Directory has all 
 
 **Demo of Premium Version of Plugin**
 
-[http://www.dreamweaverdownloads.com/demos/image-store/wp-login.php](http://www.dreamweaverdownloads.com/demos/image-store/wp-login.php "Click to access the administration area demo")
+[http://demos.net-factor.com/image-store/wp-login.php](http://demos.net-factor.com/image-store/wp-login.php "Click to access the administration area demo")
 
-[http://www.dreamweaverdownloads.com/demos/image-store/](http://www.dreamweaverdownloads.com/demos/image-store/ "Click to access the Image Store")
+[http://demos.net-factor.com/image-store/](http://demos.net-factor.com/image-store/ "Click to access the Image Store")
 
 [youtube http://www.youtube.com/watch?v=92PMxQPeVFM]
 

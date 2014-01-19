@@ -746,8 +746,8 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
 ?>        
         <p style="border:1px solid #E6DB55;margin-bottom:10px;padding:5px;background-color: #FFFFE0;">
             For reporting an issue or to request a customization, <a href="http://wordpress.dwbooster.com/contact-us" target="_blank">CLICK HERE</a>
-			<br />If you want test the premium version of Image Store go to the following links:<br/> <a href="http://www.dreamweaverdownloads.com/demos/image-store/wp-login.php" target="_blank">Administration area: Click to access the administration area demo</a><br/> 
-			<a href="http://www.dreamweaverdownloads.com/demos/image-store/" target="_blank">Public page: Click to access the Store Page</a>
+			<br />If you want test the premium version of Image Store go to the following links:<br/> <a href="http://demos.net-factor.com/image-store/wp-login.php" target="_blank">Administration area: Click to access the administration area demo</a><br/> 
+			<a href="http://demos.net-factor.com/image-store/" target="_blank">Public page: Click to access the Store Page</a>
         </p>
 
         <form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
