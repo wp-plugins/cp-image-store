@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: CP Image Store with Slideshow
-Plugin URI: http://wordpress.dwbooster.com/content-tools/cp-image-store
+Plugin URI: http://wordpress.dwbooster.com/content-tools/image-store#download
 Description: Image Store is an online store for the sale of image files: images, predefined pictures, clipart, drawings, vector images. For payment processing, Image Store uses PayPal, which is the most widely used payment gateway, safe and easy to use.
 Version: 1.0.1
 Author: CodePeople
@@ -562,7 +562,7 @@ if( !function_exists( 'cpis_customAdjustmentsLink' ) ){
     function cpis_customAdjustmentsLink( $links ){
         $customAdjustments_link = '<a href="http://wordpress.dwbooster.com/contact-us" target="_blank">'.__( 'Request custom changes', CPIS_TEXT_DOMAIN ).'</a>';
         array_unshift( $links, $customAdjustments_link );
-        $help_link = '<a href="http://wordpress.dwbooster.com/content-tools/cp-image-store" target="_blank">'.__( 'Help', CPIS_TEXT_DOMAIN ).'</a>';
+        $help_link = '<a href="http://wordpress.dwbooster.com/content-tools/image-store#download" target="_blank">'.__( 'Help', CPIS_TEXT_DOMAIN ).'</a>';
         array_unshift( $links, $help_link );
         return $links;
     }
@@ -828,13 +828,13 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                         <tr valign="top">
                             <th><?php _e( 'Set watermark', CPIS_TEXT_DOMAIN ); ?></th>
                             <td><input type="checkbox" disabled />
-                                <br /><?php _e( 'Available in <a href="http://wordpress.dwbooster.com/content-tools/cp-image-store" target="_blank" >premium version</a> of plugin.', CPIS_TEXT_DOMAIN ); ?>
+                                <br /><?php _e( 'Available in <a href="http://wordpress.dwbooster.com/content-tools/image-store#download" target="_blank" >premium version</a> of plugin.', CPIS_TEXT_DOMAIN ); ?>
                             </td>
                         </tr>
                         <tr valign="top">
                             <th><?php _e('Watermark text', CPIS_TEXT_DOMAIN); ?></th>
                             <td><input type="text" placeholder="Image Store" disabled />
-                            <br /><?php _e( 'Available in <a href="http://wordpress.dwbooster.com/content-tools/cp-image-store" target="_blank" >premium version</a> of plugin.', CPIS_TEXT_DOMAIN ); ?>
+                            <br /><?php _e( 'Available in <a href="http://wordpress.dwbooster.com/content-tools/image-store#download" target="_blank" >premium version</a> of plugin.', CPIS_TEXT_DOMAIN ); ?>
                             </td>
                         </tr>
                         
@@ -922,7 +922,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
             <div class="postbox">
                 <h3 class='hndle' style="padding:5px;"><span><?php _e( 'Paypal Payment Configuration', CPIS_TEXT_DOMAIN ); ?></span></h3>
                 <div class="inside">
-                    <table class="form-table">
+					<table class="form-table">
                         <tr valign="top">        
                         <th scope="row"><?php _e( 'Enable Paypal Payments?', CPIS_TEXT_DOMAIN ); ?></th>
                         <td><input type="checkbox" name="cpis_activate_paypal" value="1" <?php if ( $options[ 'paypal' ][ 'activate_paypal' ] ) echo 'checked'; ?> /></td>
@@ -958,9 +958,23 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                         </tr>  
                         
                         <tr valign="top">
+						<th scope="row"><?php _e('Request for the acceptance of cookies', CPIS_TEXT_DOMAIN); ?></th>
+						<td><input type="checkbox" DISABLED /> <?php _e('The users should accept store cookies to use of shopping cart.', CPIS_TEXT_DOMAIN)?>
+						<br /><?php _e( 'Available in <a href="http://wordpress.dwbooster.com/content-tools/image-store#download" target="_blank" >premium version</a> of plugin.', CPIS_TEXT_DOMAIN ); ?>
+						</td>
+						</tr>  
+						
+						<tr valign="top">
+						<th scope="row"><?php _e('Text to request the acceptance of cookies', CPIS_TEXT_DOMAIN); ?></th>
+						<td><input type="text" DISABLED size="40" /> 
+						<br /><?php _e( 'Available in <a href="http://wordpress.dwbooster.com/content-tools/image-store#download" target="_blank" >premium version</a> of plugin.', CPIS_TEXT_DOMAIN ); ?>
+						</td>
+						</tr>  
+							
+                        <tr valign="top">
                         <th scope="row"><?php _e( 'Use shopping cart', CPIS_TEXT_DOMAIN ); ?></th>
                         <td><input type="checkbox" disabled />
-                        <br /><?php _e( 'Available in <a href="http://wordpress.dwbooster.com/content-tools/cp-image-store" target="_blank" >premium version</a> of plugin.', CPIS_TEXT_DOMAIN ); ?>
+                        <br /><?php _e( 'Available in <a href="http://wordpress.dwbooster.com/content-tools/image-store#download" target="_blank" >premium version</a> of plugin.', CPIS_TEXT_DOMAIN ); ?>
                         </td>
                         </tr> 
                         
@@ -969,7 +983,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                         <td><input type="text" name="cpis_download_link" value="<?php echo esc_attr( $options[ 'store' ][ 'download_link' ] ); ?>" /> <?php _e( 'day(s)', CPIS_TEXT_DOMAIN )?></td>
                         </tr>  
                         
-                        <<tr valign="top">
+                        <tr valign="top">
                         <th scope="row"><?php _e( 'Use safe downloads', CPIS_TEXT_DOMAIN ); ?></th>
                         <td><input type="checkbox" name="cpis_safe_download" 
 						<?php 
@@ -978,14 +992,14 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
 						?> /></td>
                         </tr>  
                         
-                        tr valign="top">
+                        <tr valign="top">
                         <th scope="row"><?php _e( 'Pack all purchased audio files as a single ZIP file', CPIS_TEXT_DOMAIN ); ?></th>
                         <td><input type="checkbox" disabled >
                         <?php
                             if(!class_exists('ZipArchive'))
                                 echo '<br /><span class="explain-text">'.__("Your server can't create Zipped files dynamically. Please, contact to your hosting provider for enable ZipArchive in the PHP script", CPIS_TEXT_DOMAIN).'</span>';
                         ?>
-                        <br /><?php _e( 'Available in <a href="http://wordpress.dwbooster.com/content-tools/cp-image-store" target="_blank" >premium version</a> of plugin.', CPIS_TEXT_DOMAIN ); ?>
+                        <br /><?php _e( 'Available in <a href="http://wordpress.dwbooster.com/content-tools/image-store#download" target="_blank" >premium version</a> of plugin.', CPIS_TEXT_DOMAIN ); ?>
                         </td>
                         </tr>
                      </table>  
@@ -996,7 +1010,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
             <div class="postbox">
                 <h3 class='hndle' style="padding:5px;"><span><?php _e('Discount Settings', CPIS_TEXT_DOMAIN); ?></span></h3>
                 <div class="inside">
-                    <div style="border:1px solid #E6DB55;margin-bottom:10px;padding:5px;background-color: #FFFFE0;"><?php _e( 'Available in <a href="http://wordpress.dwbooster.com/content-tools/cp-image-store" target="_blank" >premium version</a> of plugin.', CPIS_TEXT_DOMAIN ); ?></div><br />
+                    <div style="border:1px solid #E6DB55;margin-bottom:10px;padding:5px;background-color: #FFFFE0;"><?php _e( 'Available in <a href="http://wordpress.dwbooster.com/content-tools/image-store#download" target="_blank" >premium version</a> of plugin.', CPIS_TEXT_DOMAIN ); ?></div><br />
                     <div><input type="checkbox" disabled /> <?php _e('Display discount promotions in the music store page', CPIS_TEXT_DOMAIN)?></div>
                     <h4><?php _e('Scheduled Discounts', CPIS_TEXT_DOMAIN);?></h4>
                     <table class="form-table cpis_discount_table" style="border:1px dotted #dfdfdf;">
@@ -1040,7 +1054,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
             <div class="postbox">
                 <h3 class='hndle' style="padding:5px;"><span><?php _e('Coupons Settings', CPIS_TEXT_DOMAIN); ?></span></h3>
                 <div class="inside">
-                    <div style="border:1px solid #E6DB55;margin-bottom:10px;padding:5px;background-color: #FFFFE0;"><?php _e( 'Available in <a href="http://wordpress.dwbooster.com/content-tools/cp-image-store" target="_blank" >premium version</a> of plugin.', CPIS_TEXT_DOMAIN ); ?></div>
+                    <div style="border:1px solid #E6DB55;margin-bottom:10px;padding:5px;background-color: #FFFFE0;"><?php _e( 'Available in <a href="http://wordpress.dwbooster.com/content-tools/image-store#download" target="_blank" >premium version</a> of plugin.', CPIS_TEXT_DOMAIN ); ?></div>
                     <h4><?php _e('Coupons List', CPIS_TEXT_DOMAIN);?></h4>
                     <table class="form-table cpis_coupon_table" style="border:1px dotted #dfdfdf;">
                         <tr>

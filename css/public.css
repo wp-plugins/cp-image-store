@@ -30,13 +30,13 @@
 
 
 .cpis-image-data a{ text-decoration: none; }
-.cpis-image-right{ background: #FFF; padding: 10px; max-width: 300px;}
+.cpis-image-right{ background: #FFF; padding: 0 10px 10px 10px; max-width: 300px;}
 .cpis-image-right li{ list-style: none; }
 .cpis-image-data .cpis-image-title,
 .cpis-image-data .cpis-image-title a{ color: #FFF; text-align: center;  text-transform: uppercase; font-weight:bolder; }
 .cpis-image-description{}
 
-.cpis-image-file{ margin-top: 20px;}
+.cpis-image-file{}
 .cpis-image-buttons{}
 
 .cpis-discount-promotion{ font-style: italic; margin-top: 10px;}

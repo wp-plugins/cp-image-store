@@ -1,6 +1,6 @@
 === CP Image Store with Slideshow ===
 Contributors: codepeople
-Donate link: http://wordpress.dwbooster.com/content-tools/cp-image-store
+Donate link: http://wordpress.dwbooster.com/content-tools/image-store
 Tags:sell pictures,gallery,galleries,image store,paypal,photo store,slideshow,photo gallery,photography,photos,sell digital print,sell images,sell photo,sell photos,photo selling,images,image,photos,pictures,clipart,vector,e-commerce,ecommerce,facebook,google,google+,html5,carousel,shop,social,social network,store,twitter
 Requires at least: 3.0.5
 Tested up to: 3.8
@@ -42,6 +42,7 @@ The base plugin, available for free from the WordPress Plugin Directory has all 
 **Premium Features**
 
 *	Includes a shopping cart to buy multiple products in a single purchase
+*   Allows request to the users the acceptance to save cookies
 *	Allows to insert list of products filtered by top selling or newest products
 *	Allows including a watermark on image previews
 *	Allows to set discounts to promote sales
@@ -139,6 +140,8 @@ This section defines the options for the payment gateway.
 *   Currency Symbol: Symbol of the currency in which payments are accepted and prices shown in the CP Image Store with Slideshow.
 *   PayPal Language: Language in which PayPal will be loaded.
 *   Use shopping cart: Activate the shopping cart to allow purchase of several products at once.
+*   Allows request to the users the acceptance to save cookies. If check the box the customers should accept store cookies to use of shopping cart.
+*   Text for requesting the acceptance of cookies.
 *   Download link valid for: Enter the number of days during which the generated download link will be valid;  past this number of days the download link will expire.
 *   Use safe downloads: Requires that the customer type the email address used to purchase the products before download them.
 *   Pack all Purchased image files as a single ZIP file: You can group all products purchased in one compacted file.

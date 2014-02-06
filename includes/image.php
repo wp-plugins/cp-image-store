@@ -565,7 +565,7 @@ if( !function_exists( 'cpis_save_image' ) ){
             }
             
             if( !empty( $image->post_content ) ){
-                $data_arr[ 'description' ] = $image->post_content;
+                $data_arr[ 'description' ] = '<p>'.preg_replace( '/[\n\r]+/', '</p><p>', $image->post_content ).'</p>';
             }
             
             if( !empty( $image->post_title ) ){
@@ -715,13 +715,9 @@ if( !function_exists( 'cpis_save_image' ) ){
     function cpis_print_single( $arr ){
         $code = '<div class="cpis-single-image-data">';
         
-        if( isset( $arr[ 'intermediate' ] ) || isset( $arr[ 'description' ] ) ){
+        if( isset( $arr[ 'intermediate' ] ) ){
             $code .= '<div class="cpis-image-left">';
-            
-            if( isset( $arr[ 'intermediate' ] ) ) $code .= '<img src="'.$arr[ 'intermediate' ].'" />';
-            
-            if( isset( $arr[ 'description' ] ) ) $code .= '<div class="cpis-image-description">'.$arr[ 'description' ].'</div>';
-            
+            $code .= '<img src="'.$arr[ 'intermediate' ].'" />';
             $code .= '</div><div class="cpis-image-right with-left">';
             
         }else{
@@ -772,6 +768,8 @@ if( !function_exists( 'cpis_save_image' ) ){
         
         $code .= '
             </div>
+			<div style="clear:both;"></div>
+			'.( ( isset( $arr[ 'description' ] ) ) ? '<div class="cpis-image-description">'.$arr[ 'description' ].'</div>' : '' ).'
             <div style="clear:both;"></div>
             '.( ( isset( $arr[ 'carousel' ] ) ) ? $arr[ 'carousel' ] : '' ).
             ( ( isset( $arr[ 'store_url' ] ) )  ? '<div class="cpis-store-page-link"><a href="'.$arr[ 'store_url' ].'">'.__( 'Return to the store page', CPIS_TEXT_DOMAIN ).'</a></div>' : '' ).'
