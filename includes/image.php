@@ -749,7 +749,7 @@ if( !function_exists( 'cpis_save_image' ) ){
                   js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=55224759839";
                   fjs.parentNode.insertBefore(js, fjs);
                 }(document, "script", "facebook-jssdk"));</script>
-                <div><div class="fb-like" data-href="'.$arr[ 'link' ].'" data-send="true" data-layout="button_count" data-width="450" data-show-faces="false"></div></div>
+                <div><div class="fb-like" data-href="'.$arr[ 'link' ].'" data-send="true" data-layout="button_count" data-width="450" data-show-faces="false" style="overflow:hidden;"></div></div>
                 
                 <div><div class="g-plus" data-action="share" data-annotation="bubble"></div></div>
                 <script type="text/javascript">
