@@ -59,16 +59,7 @@
 				
 				foreach( $purchase_rows as $purchase ){
 
-					if( !current_user_can( 'manage_options' ) ){
-						$diff = abs( strtotime( $purchase->date )-time() );
-						if($diff > $interval){
-							$download_links_str = __('The download link has expired, please contact to the vendor', CPIS_TEXT_DOMAIN);
-							break;
-						}
-					}    
-					
 					$id = $purchase->product_id;
-					
 					$obj = $wpdb->get_row(
 						$wpdb->prepare(
 							"SELECT file.path as path, file.url as link, post.post_title as title

@@ -195,6 +195,7 @@ if( !function_exists( 'cpis_create_db' ) ){
             product_id mediumint(9) NOT NULL,
             purchase_id varchar(50) NOT NULL,
             date DATETIME NOT NULL,
+			checking_date DATETIME,
             email VARCHAR(255) NOT NULL,
             amount FLOAT NOT NULL DEFAULT 0,
             paypal_data TEXT,
@@ -202,6 +203,13 @@ if( !function_exists( 'cpis_create_db' ) ){
             UNIQUE KEY id (id)
          );";             
         $wpdb->query($sql); 
+		
+		$result = $wpdb->get_results("SHOW COLUMNS FROM ".$wpdb->prefix.CPIS_PURCHASE." LIKE 'checking_date'");
+		if(empty($result)){
+			$sql = "ALTER TABLE ".$wpdb->prefix.CPIS_PURCHASE." ADD checking_date DATETIME";
+			$wpdb->query($sql);
+		}    
+        
     }
 } // End cpis_create_db
 
@@ -1141,14 +1149,27 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
     function cpis_reports_page(){
         global $wpdb;
         if ( isset( $_POST[ 'cpis_purchase_stats' ] ) && wp_verify_nonce( $_POST[ 'cpis_purchase_stats' ], plugin_basename( __FILE__ ) ) ){
-            if( isset( $_POST[ 'purchase_id' ] ) ){ // Delete the purchase
-                $wpdb->query(
-                    $wpdb->prepare(
-                        "DELETE FROM ".$wpdb->prefix.CPIS_PURCHASE." WHERE id=%d",
-                        $_POST[ 'purchase_id' ]
-                    )
-                );
-            }
+            if(isset($_POST['delete_purchase_id'])){ // Delete the purchase
+				$wpdb->query($wpdb->prepare(
+					"DELETE FROM ".$wpdb->prefix.CPIS_PURCHASE." WHERE id=%d",
+					$_POST['delete_purchase_id']
+				));
+			}
+			
+			if(isset($_POST['reset_purchase_id'])){ // Delete the purchase
+				$wpdb->query($wpdb->prepare(
+					"UPDATE ".$wpdb->prefix.CPIS_PURCHASE." SET checking_date = NOW() WHERE id=%d",
+					$_POST['reset_purchase_id']
+				));
+			}
+			
+			if(isset($_POST['show_purchase_id'])){ // Delete the purchase
+				$paypal_data = '<div class="cpis-paypal-data"><h3>' . __( 'PayPal data', CPIS_TEXT_DOMAIN ) . '</h3>' . $wpdb->get_var($wpdb->prepare(
+					"SELECT paypal_data FROM ".$wpdb->prefix.CPIS_PURCHASE." WHERE id=%d",
+					$_POST['show_purchase_id']
+				)) . '</div>';
+				$paypal_data = preg_replace( '/\n+/', '<br />', $paypal_data );
+			}
         }
 
 		$group_by_arr = array( 
@@ -1321,6 +1342,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
             <h3 class='hndle' style="padding:5px;"><span><?php _e( 'Store sales report', CPIS_TEXT_DOMAIN ); ?></span></h3>
             <div class="inside">
 				<?php 
+					if( !empty( $paypal_data ) ) print $paypal_data;
 					if(count($purchase_list)){	
 						print '
 							<div>
@@ -1378,7 +1400,11 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
 											<TD>'.$purchase->amount.'</TD>
 											<TD>'.$currency.'</TD>
 											<TD><a href="'.$dlurl.$purchase->purchase_id.'" target="_blank">Download Link</a></TD>
-											<TD><input type="button" class="button-primary" onclick="cpis_delete_purchase('.$purchase->id.');" value="Delete"></TD>
+											<TD style="white-space:nowrap;">
+												<input type="button" class="button-primary" onclick="cpis_delete_purchase('.$purchase->id.');" value="Delete"> 
+												<input type="button" class="button-primary" onclick="cpis_reset_purchase('.$purchase->id.');" value="Reset Time"> 
+												<input type="button" class="button-primary" onclick="cpis_show_purchase('.$purchase->id.');" value="PayPal Info">
+											</TD>
 										</TR>
 									';
 								}elseif( $to_display == 'amount' ){
@@ -1602,7 +1628,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
 						}else{
 							$error = ( !empty( $_REQUEST[ 'error_mssg' ] ) ) ? $_REQUEST[ 'error_mssg' ] : '';
 							
-							if( !empty( $_SESSION[ 'cpis_user_email' ] ) ){
+							if( ( !get_option( 'cpis_safe_download', CPIS_SAFE_DOWNLOAD ) && !empty( $cpis_errors ) ) || !empty( $_SESSION[ 'cpis_user_email' ] ) ){
 								$error .= '<li>'.implode( '</li><li>', $cpis_errors ).'</li>';
 							}
 							
@@ -2015,9 +2041,9 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
 				cpis_setError( "Please, go to the download page, and enter the email address used in products purchasing" );
 				return false;
 			}	
-			$days = $wpdb->get_var( $wpdb->prepare( 'SELECT DATEDIFF(NOW(), date) FROM '.$wpdb->prefix.CPIS_PURCHASE.' WHERE purchase_id=%s AND email=%s ORDER BY date DESC', array( $_REQUEST[ 'purchase_id' ], $_SESSION[ 'cpis_user_email' ] ) ) );
+			$days = $wpdb->get_var( $wpdb->prepare( 'SELECT CASE WHEN checking_date IS NULL THEN DATEDIFF(NOW(), date) ELSE DATEDIFF(NOW(), checking_date) END FROM '.$wpdb->prefix.CPIS_PURCHASE.' WHERE purchase_id=%s AND email=%s ORDER BY checking_date DESC, date DESC', array( $_REQUEST[ 'purchase_id' ], $_SESSION[ 'cpis_user_email' ] ) ) );
 		}else{
-			$days = $wpdb->get_var( $wpdb->prepare( 'SELECT DATEDIFF(NOW(), date) FROM '.$wpdb->prefix.CPIS_PURCHASE.' WHERE purchase_id=%s ORDER BY date DESC', array( $_REQUEST[ 'purchase_id' ] ) ) );
+			$days = $wpdb->get_var( $wpdb->prepare( 'SELECT CASE WHEN checking_date IS NULL THEN DATEDIFF(NOW(), date) ELSE DATEDIFF(NOW(), checking_date) END FROM '.$wpdb->prefix.CPIS_PURCHASE.' WHERE purchase_id=%s ORDER BY checking_date DESC, date DESC', array( $_REQUEST[ 'purchase_id' ] ) ) );
 		}
 		
 		global $options;

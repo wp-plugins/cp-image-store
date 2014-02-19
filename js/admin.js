@@ -121,12 +121,24 @@
 		window['cpis_delete_purchase'] = function(id){
 			if(confirm('Are you sure to delete the purchase record?')){
 				var f = $('#purchase_form');
-				f.append('<input type="hidden" name="purchase_id" value="'+id+'" />');
+				f.append('<input type="hidden" name="delete_purchase_id" value="'+id+'" />');
 				f[0].submit();
 			}	
 		};
 		
-        window["cpis_new_file"] = function(){
+		window['cpis_reset_purchase'] = function(id){
+			var f = $('#purchase_form');
+			f.append('<input type="hidden" name="reset_purchase_id" value="'+id+'" />');
+			f[0].submit();
+		};
+		
+        window['cpis_show_purchase'] = function(id){
+			var f = $('#purchase_form');
+			f.append('<input type="hidden" name="show_purchase_id" value="'+id+'" />');
+			f[0].submit();
+		};
+		
+		window["cpis_new_file"] = function(){
             var nTr =   ' \
                             <tr> \
                                 <td style="width:60%;"><input type="file" name="cpis_file_new[]" style="width:100%;" /></td> \
