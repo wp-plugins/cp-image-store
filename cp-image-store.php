@@ -969,21 +969,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                         <th scope="row"><?php _e( 'Paypal language', CPIS_TEXT_DOMAIN ); ?></th>
                         <td><input type="text" name="cpis_language" value="<?php echo esc_attr( $options [ 'paypal' ][ 'language' ] ); ?>" /></td>
                         </tr>  
-                        
-                        <tr valign="top">
-						<th scope="row"><?php _e('Request for the acceptance of cookies', CPIS_TEXT_DOMAIN); ?></th>
-						<td><input type="checkbox" DISABLED /> <?php _e('The users should accept store cookies to use of shopping cart.', CPIS_TEXT_DOMAIN)?>
-						<br /><?php _e( 'Available in <a href="http://wordpress.dwbooster.com/content-tools/image-store#download" target="_blank" >premium version</a> of plugin.', CPIS_TEXT_DOMAIN ); ?>
-						</td>
-						</tr>  
-						
-						<tr valign="top">
-						<th scope="row"><?php _e('Text to request the acceptance of cookies', CPIS_TEXT_DOMAIN); ?></th>
-						<td><input type="text" DISABLED size="40" /> 
-						<br /><?php _e( 'Available in <a href="http://wordpress.dwbooster.com/content-tools/image-store#download" target="_blank" >premium version</a> of plugin.', CPIS_TEXT_DOMAIN ); ?>
-						</td>
-						</tr>  
-							
+ 							
                         <tr valign="top">
                         <th scope="row"><?php _e( 'Use shopping cart', CPIS_TEXT_DOMAIN ); ?></th>
                         <td><input type="checkbox" disabled />
