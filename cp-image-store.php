@@ -415,7 +415,7 @@ if( !function_exists( 'cpis_init_taxonomies' ) ){
 add_action('init', 'cpis_init', 0);
 if( !function_exists( 'cpis_init' ) ){
     function cpis_init(){
-        load_plugin_textdomain(CPIS_TEXT_DOMAIN, false, dirname(plugin_basename(__FILE__)) . '/../languages/');
+        load_plugin_textdomain(CPIS_TEXT_DOMAIN, false, dirname(plugin_basename(__FILE__)) . '/languages/');
         
         // Create post types
         cpis_init_post_types();
