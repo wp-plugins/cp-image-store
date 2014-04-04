@@ -72,6 +72,7 @@ The security in the access to products files is determined in different ways.
 *	The products files can't be accessed directly. The purchased files are stored in a special directory called downloads, the downloads directory includes a .htaccess file that forbid the access from browser. The files can be accessed only through a server side script that validates the purchase.  
 *	The Store determines the validity of  download links based in two options, available in the settings page of plugin.
 It is possible define a time period, in days, where a download link is considered valid. If a user tries to download a purchased product, the Store checks the date of purchasing.
+It is possible define a limit of downloads by purchase. If a user tries to download a product, the Music Store checks how many downloads have been made.
 The  Store may be configured to request the email address used in the purchasing to check the validity of download link.
 
 == Installation ==
@@ -140,6 +141,7 @@ This section defines the options for the payment gateway.
 *   PayPal Language: Language in which PayPal will be loaded.
 *   Use shopping cart: Activate the shopping cart to allow purchase of several products at once.
 *   Download link valid for: Enter the number of days during which the generated download link will be valid;  past this number of days the download link will expire.
+*   Number of downloads allowed by purchase: Enter the number of downloads allowed by purchased product.
 *   Use safe downloads: Requires that the customer type the email address used to purchase the products before download them.
 *   Pack all Purchased image files as a single ZIP file: You can group all products purchased in one compacted file.
 

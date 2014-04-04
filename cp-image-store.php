@@ -142,6 +142,7 @@ if( !function_exists( 'cpis_default_options' ) ){
                 'social_buttons'    => true,
                 'pack_files'        => false,
                 'download_link'     => 3,
+                'download_limit'	=> 3,
                 'display_promotion' => true
             ),
             
@@ -163,7 +164,14 @@ if( !function_exists( 'cpis_create_db' ) ){
     function cpis_create_db(){
         global $wpdb;
 			
-        $sql = "CREATE TABLE IF NOT EXISTS ".$wpdb->prefix.CPIS_IMAGE." (
+        if( !empty( $_SESSION[ 'cpis_created_db' ] ) )
+		{
+			return;
+		}	
+		
+		$_SESSION[ 'cpis_created_db' ] = true;
+			
+		$sql = "CREATE TABLE IF NOT EXISTS ".$wpdb->prefix.CPIS_IMAGE." (
             id mediumint(9) NOT NULL,
             purchases mediumint(9) NOT NULL DEFAULT 0,
             preview TEXT,
@@ -198,6 +206,7 @@ if( !function_exists( 'cpis_create_db' ) ){
 			checking_date DATETIME,
             email VARCHAR(255) NOT NULL,
             amount FLOAT NOT NULL DEFAULT 0,
+            downloads INT NOT NULL DEFAULT 0,
             paypal_data TEXT,
             note TEXT,
             UNIQUE KEY id (id)
@@ -210,7 +219,13 @@ if( !function_exists( 'cpis_create_db' ) ){
 			$wpdb->query($sql);
 		}    
         
-    }
+		$result = $wpdb->get_results("SHOW COLUMNS FROM ".$wpdb->prefix.CPIS_PURCHASE." LIKE 'downloads'");
+		if(empty($result)){
+			$sql = "ALTER TABLE ".$wpdb->prefix.CPIS_PURCHASE." ADD downloads INT NOT NULL DEFAULT 0";
+			$wpdb->query($sql);
+		}    
+            	
+	}
 } // End cpis_create_db
 
 /** REGISTER POST TYPES AND TAXONOMIES **/
@@ -732,9 +747,10 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                 'columns'            => $_POST['cpis_columns'],
                 'pack_files'         => false,
                 'download_link'      => $_POST['cpis_download_link'],
+                'download_limit'     => $_POST['cpis_download_limit'],
                 'display_promotion'  => false
             );
-            
+
             $noptions['notification'] = array(
                 'from'                  => $_POST['cpis_from'],
                 'to'                    => $_POST['cpis_to'],
@@ -983,6 +999,11 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                         </tr>  
                         
                         <tr valign="top">
+                        <th scope="row"><?php _e( 'Number of downloads allowed by purchase', CPIS_TEXT_DOMAIN ); ?></th>
+                        <td><input type="text" name="cpis_download_limit" value="<?php echo esc_attr( $options[ 'store' ][ 'download_limit' ] ); ?>" /></td>
+                        </tr>  
+                        
+                        <tr valign="top">
                         <th scope="row"><?php _e( 'Use safe downloads', CPIS_TEXT_DOMAIN ); ?></th>
                         <td><input type="checkbox" name="cpis_safe_download" 
 						<?php 
@@ -1144,7 +1165,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
 			
 			if(isset($_POST['reset_purchase_id'])){ // Delete the purchase
 				$wpdb->query($wpdb->prepare(
-					"UPDATE ".$wpdb->prefix.CPIS_PURCHASE." SET checking_date = NOW() WHERE id=%d",
+					"UPDATE ".$wpdb->prefix.CPIS_PURCHASE." SET checking_date = NOW(), downloads = 0 WHERE id=%d",
 					$_POST['reset_purchase_id']
 				));
 			}
@@ -1388,7 +1409,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
 											<TD><a href="'.$dlurl.$purchase->purchase_id.'" target="_blank">Download Link</a></TD>
 											<TD style="white-space:nowrap;">
 												<input type="button" class="button-primary" onclick="cpis_delete_purchase('.$purchase->id.');" value="Delete"> 
-												<input type="button" class="button-primary" onclick="cpis_reset_purchase('.$purchase->id.');" value="Reset Time"> 
+												<input type="button" class="button-primary" onclick="cpis_reset_purchase('.$purchase->id.');" value="Reset Time and Downloads"> 
 												<input type="button" class="button-primary" onclick="cpis_show_purchase('.$purchase->id.');" value="PayPal Info">
 											</TD>
 										</TR>
@@ -2027,22 +2048,29 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
 				cpis_setError( "Please, go to the download page, and enter the email address used in products purchasing" );
 				return false;
 			}	
-			$days = $wpdb->get_var( $wpdb->prepare( 'SELECT CASE WHEN checking_date IS NULL THEN DATEDIFF(NOW(), date) ELSE DATEDIFF(NOW(), checking_date) END FROM '.$wpdb->prefix.CPIS_PURCHASE.' WHERE purchase_id=%s AND email=%s ORDER BY checking_date DESC, date DESC', array( $_REQUEST[ 'purchase_id' ], $_SESSION[ 'cpis_user_email' ] ) ) );
+			$data = $wpdb->get_row( $wpdb->prepare( 'SELECT CASE WHEN checking_date IS NULL THEN DATEDIFF(NOW(), date) ELSE DATEDIFF(NOW(), checking_date) END AS days, downloads, id FROM '.$wpdb->prefix.CPIS_PURCHASE.' WHERE purchase_id=%s AND email=%s ORDER BY checking_date DESC, date DESC', array( $_REQUEST[ 'purchase_id' ], $_SESSION[ 'cpis_user_email' ] ) ) );
 		}else{
-			$days = $wpdb->get_var( $wpdb->prepare( 'SELECT CASE WHEN checking_date IS NULL THEN DATEDIFF(NOW(), date) ELSE DATEDIFF(NOW(), checking_date) END FROM '.$wpdb->prefix.CPIS_PURCHASE.' WHERE purchase_id=%s ORDER BY checking_date DESC, date DESC', array( $_REQUEST[ 'purchase_id' ] ) ) );
+			$data = $wpdb->get_row( $wpdb->prepare( 'SELECT CASE WHEN checking_date IS NULL THEN DATEDIFF(NOW(), date) ELSE DATEDIFF(NOW(), checking_date) END AS days, downloads, id FROM '.$wpdb->prefix.CPIS_PURCHASE.' WHERE purchase_id=%s ORDER BY checking_date DESC, date DESC', array( $_REQUEST[ 'purchase_id' ] ) ) );
 		}
 		
-		global $options;
+		$options = get_option( 'cpis_options' );
 		$valid_download = ( !empty( $options[ 'store' ][ 'download_link' ] ) ) ? $options[ 'store' ][ 'download_link' ] : 3 ;
-
-		if( is_null( $days ) ){
+		if( is_null( $data ) ){
 			cpis_setError( 'There is no product associated with the entered data' );
 			return false;
-		}elseif( $valid_download < $days ){ 
+		}elseif( $valid_download < $data->days ){ 
 			cpis_setError( 'The download link has expired, please contact to the vendor' );
 			return false;	
+		}elseif( $options[ 'store' ][ 'download_limit' ] > 0 &&  $options[ 'store' ][ 'download_limit' ] <= $data->downloads ){
+			cpis_setError( 'The number of downloads has reached its limit, please contact to the vendor' );
+			return false;
 		}
 
+		if( isset( $_REQUEST[ 'f' ] ) )
+		{
+			$wpdb->query( $wpdb->prepare( 'UPDATE '.$wpdb->prefix.CPIS_PURCHASE.' SET downloads=downloads+1 WHERE id=%d', $data->id ) );
+		}
+		
 		return true;
 	} 
  } // End cpis_check_download_permissions
@@ -2262,7 +2290,7 @@ if( !function_exists( 'cpis_download_file' ) ){
 			}
 		}else{
 			$dlurl = _cpis_create_pages( 'cpis-download-page', 'Download Page' );
-			$dlurl .= ( ( strpos( $dlurl, '?' ) === false ) ? '?' : '&' ).'cpis-action=download&error_mssg='.urlencode( '<li>'.implode( '</li><li>', $cpis_errors ).'</li>' ).( ( !empty( $_REQUEST[ 'purchase_id' ] ) ) ? '&purchase_id='.$_REQUEST[ 'purchase_id' ] : '' );
+			$dlurl .= ( ( strpos( $dlurl, '?' ) === false ) ? '?' : '&' ).'cpis-action=download'.( ( !empty( $_REQUEST[ 'purchase_id' ] ) ) ? '&purchase_id='.$_REQUEST[ 'purchase_id' ] : '' );
 			header( 'location: '.$dlurl );
 		}
 		exit;
