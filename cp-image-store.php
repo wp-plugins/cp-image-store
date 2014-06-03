@@ -26,12 +26,18 @@ if(!function_exists('cpis_get_site_url')){
 
 global $cpis_images_preview, $cpis_errors;
 $cpis_errors = array();
+
 $cpis_images_preview = '';
+$cpis_upload_path = wp_upload_dir();
 
 // CONST
 define( 'CPIS_PLUGIN_DIR', dirname( __FILE__ ) );
 define( 'CPIS_PLUGIN_URL', plugins_url( '', __FILE__ ) );
 define( 'CPIS_H_URL', cpis_get_site_url() );
+
+define( 'CPIS_UPLOAD_DIR', ( ( file_exists( CPIS_PLUGIN_DIR.'/uploads' ) ) ? CPIS_PLUGIN_DIR.'/uploads' : $cpis_upload_path[ 'basedir' ].'/cpis_uploads' ) );
+define( 'CPIS_UPLOAD_URL', ( ( file_exists( CPIS_PLUGIN_DIR.'/uploads' ) ) ? CPIS_PLUGIN_URL.'/uploads' : $cpis_upload_path[ 'baseurl' ].'/cpis_uploads' ) );
+
 define( 'CPIS_DOWNLOAD', dirname( __FILE__ ).'/downloads' );
 define( 'CPIS_IMAGE_STORE_SLUG', 'image-store-menu' );
 define( 'CPIS_IMAGES_URL',  CPIS_PLUGIN_URL.'/images' );
@@ -1585,11 +1591,16 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
  if( !function_exists( 'cpis_upload_dir' ) ){
     function cpis_upload_dir( $path ){
         global $post;
+        
+		if( !file_exists( CPIS_UPLOAD_DIR ) ) @mkdir( CPIS_UPLOAD_DIR, 0755 );
+		if( !file_exists( CPIS_UPLOAD_DIR.'/files' ) ) @mkdir( CPIS_UPLOAD_DIR.'/files', 0755 );
+		if( !file_exists( CPIS_UPLOAD_DIR.'/previews' ) ) @mkdir( CPIS_UPLOAD_DIR.'/previews', 0755 );
+		
         if( isset( $post ) && 'cpis_image' == $post->post_type ){
-            $path[ 'path' ] = CPIS_PLUGIN_DIR.'/uploads/files'.$path[ 'subdir' ];
-            $path[ 'url' ] = CPIS_PLUGIN_URL.'/uploads/files'.$path[ 'subdir' ];
-            $path[ 'basedir' ] = CPIS_PLUGIN_DIR.'/uploads/files';
-            $path[ 'baseurl' ] = CPIS_PLUGIN_URL.'/uploads/files';
+            $path[ 'path' ] = CPIS_UPLOAD_DIR.'/files'.$path[ 'subdir' ];
+            $path[ 'url' ] = CPIS_UPLOAD_URL.'/files'.$path[ 'subdir' ];
+            $path[ 'basedir' ] = CPIS_UPLOAD_DIR.'/files';
+            $path[ 'baseurl' ] = CPIS_UPLOAD_URL.'/files';
             return $path;
         }
         return $path;

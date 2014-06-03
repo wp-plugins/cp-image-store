@@ -346,15 +346,15 @@ if( !function_exists( 'cpis_save_image' ) ){
                 $options = get_option( 'cpis_options' );
                 $t = time();
                 $ext = pathinfo( $movefile[ 'file' ], PATHINFO_EXTENSION );
-                $thumbnail_path = CPIS_PLUGIN_DIR.'/uploads/previews/'.$t.'.'.$ext;
-                $thumbnail_url  = CPIS_PLUGIN_URL.'/uploads/previews/'.$t.'.'.$ext;
+                $thumbnail_path = CPIS_UPLOAD_DIR.'/previews/'.$t.'.'.$ext;
+                $thumbnail_url  = CPIS_UPLOAD_URL.'/previews/'.$t.'.'.$ext;
 
                 if( 
                     cpis_watermarkImage( $movefile[ 'file' ], $thumbnail_path,  $options[ 'image' ][ 'thumbnail' ][ 'width' ],  $options[ 'image' ][ 'thumbnail' ][ 'height' ] ) 
                 ){
                     $t = time()+1;
-                    $intermediate_path = CPIS_PLUGIN_DIR.'/uploads/previews/'.$t.'.'.$ext;
-                    $intermediate_url  = CPIS_PLUGIN_URL.'/uploads/previews/'.$t.'.'.$ext;
+                    $intermediate_path = CPIS_UPLOAD_DIR.'/previews/'.$t.'.'.$ext;
+                    $intermediate_url  = CPIS_UPLOAD_URL.'/previews/'.$t.'.'.$ext;
                     if( 
                         cpis_watermarkImage( $movefile[ 'file' ], $intermediate_path,  $options[ 'image' ][ 'intermediate' ][ 'width' ],  $options[ 'image' ][ 'intermediate' ][ 'height' ] ) 
                     ){
