@@ -1,4 +1,4 @@
-﻿(function($){
+﻿jQuery(function($){
 	var xmouse, ymouse;
     
     $(document).bind( 'mousemove', function( e ){
@@ -140,4 +140,4 @@
             );
         }
     );    
-})(jQuery);
+});
