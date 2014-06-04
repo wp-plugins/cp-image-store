@@ -1,7 +1,7 @@
 === CP Image Store with Slideshow ===
 Contributors: codepeople
 Donate link: http://wordpress.dwbooster.com/content-tools/image-store
-Tags:sell pictures,gallery,galleries,image store,paypal,photo store,slideshow,photo gallery,photography,photos,sell digital print,sell images,sell photo,sell photos,photo selling,images,image,photos,pictures,clipart,vector,e-commerce,ecommerce,facebook,google,google+,html5,carousel,shop,social,social network,store,twitter,discounts
+Tags:sell pictures,gallery,galleries,image store,paypal,photo store,slideshow,photo gallery,photography,photos,sell digital print,sell images,sell photo,sell photos,photo selling,images,image,photos,pictures,clipart,sell clipart,vector,e-commerce,ecommerce,facebook,google,google+,html5,carousel,shop,social,social network,store,twitter,discounts
 Requires at least: 3.0.5
 Tested up to: 3.9
 Stable tag: 1.0.1
