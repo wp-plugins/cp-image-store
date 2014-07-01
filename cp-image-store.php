@@ -2009,9 +2009,13 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
         foreach($results as $result){
             $right .= "<div style='width:{$width}%;{$margin}' class='cpis-image-store-item'>".cpis_display_content( $result->ID, 'store', 'return' )."</div>";
             $item_counter++;
+            $margin = "margin-left:2%;";
             if($item_counter % $options[ 'store' ][ 'columns' ] == 0)
+            {
                 $right .= "<div style='clear:both;'></div>";
-            $margin = "margin-left:2%;";    
+                $margin = "";
+            }    
+                
         }
         $right .= "<div style='clear:both;'></div>";
         $right .= "</div>";
