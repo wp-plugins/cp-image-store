@@ -469,8 +469,8 @@ if( !function_exists( 'cpis_init' ) ){
             }
             add_shortcode( 'codepeople-image-store', 'cpis_replace_shortcode' );
             add_shortcode( 'codepeople-image-store-product', 'cpis_replace_product_shortcode' );
-            add_filter( 'the_content', 'cpis_the_content' );
-			add_filter( 'the_excerpt', 'cpis_the_excerpt' );
+            add_filter( 'the_content', 'cpis_the_content', 1 );
+			add_filter( 'the_excerpt', 'cpis_the_excerpt', 1 );
         }
     }
 } // End cpis_ini
