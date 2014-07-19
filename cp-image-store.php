@@ -24,11 +24,13 @@ if(!function_exists('cpis_get_site_url')){
 
 // Global variable used to print the images preview in the website footer
 
-global $cpis_images_preview, $cpis_errors;
+global $cpis_images_preview, $cpis_errors, $cpis_layout, $cpis_layouts;
 $cpis_errors = array();
 
 $cpis_images_preview = '';
 $cpis_upload_path = wp_upload_dir();
+$cpis_layouts = array();
+$cpis_layout  = array();
 
 // CONST
 define( 'CPIS_PLUGIN_DIR', dirname( __FILE__ ) );
@@ -436,8 +438,16 @@ if( !function_exists( 'cpis_init_taxonomies' ) ){
 add_action('init', 'cpis_init', 0);
 if( !function_exists( 'cpis_init' ) ){
     function cpis_init(){
+        global $cpis_layout;
+        
         load_plugin_textdomain(CPIS_TEXT_DOMAIN, false, dirname(plugin_basename(__FILE__)) . '/languages/');
         
+        // Load selected layout
+        if ( false !== get_option( 'cpis_layout' ) )
+        {
+            $cpis_layout = get_option( 'cpis_layout' );
+        }
+
         // Create post types
         cpis_init_post_types();
         
@@ -474,6 +484,30 @@ if( !function_exists( 'cpis_init' ) ){
         }
     }
 } // End cpis_ini
+
+if( !function_exists( 'cpis_load_layouts' ) ){
+    /**
+    * Get the list of available layouts
+    */
+    function cpis_load_layouts(){	
+        global $cpis_layouts;
+        
+        $tpls_dir = dir( CPIS_PLUGIN_DIR.'/layouts' );
+        while( false !== ( $entry = $tpls_dir->read() ) ) 
+        {    
+            if ( $entry != '.' && $entry != '..' && is_dir( $tpls_dir->path.'/'.$entry ) && file_exists( $tpls_dir->path.'/'.$entry.'/config.ini' ) )
+            {
+                if( ( $ini_array = parse_ini_file( $tpls_dir->path.'/'.$entry.'/config.ini' ) ) !== false )
+                {
+                    if( !empty( $ini_array[ 'style_file' ] ) ) $ini_array[ 'style_file' ] = CPIS_PLUGIN_URL.'/layouts/'.$entry.'/'.$ini_array[ 'style_file' ];
+                    if( !empty( $ini_array[ 'script_file' ] ) ) $ini_array[ 'script_file' ] = CPIS_PLUGIN_URL.'/layouts/'.$entry.'/'.$ini_array[ 'script_file' ];
+                    if( !empty( $ini_array[ 'thumbnail' ] ) ) $ini_array[ 'thumbnail' ] = CPIS_PLUGIN_URL.'/layouts/'.$entry.'/'.$ini_array[ 'thumbnail' ];
+                    $cpis_layouts[ $ini_array[ 'id' ] ] = $ini_array;
+                }
+            }			
+        }
+    }
+}
 
 if( !function_exists( 'cpis_load_widgets' ) ){
     function cpis_load_widgets(){
@@ -686,7 +720,10 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
  */
  if( !function_exists( 'cpis_settings_page' ) ){
     function cpis_settings_page(){
-        global $wpdb;
+        global $wpdb, $cpis_layouts, $cpis_layout;
+        
+        cpis_load_layouts();
+
         $options = get_option( 'cpis_options' );
         
         if (isset($_POST['cpis_settings']) && wp_verify_nonce( $_POST['cpis_settings'], plugin_basename( __FILE__ ) ) ){
@@ -696,6 +733,17 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
             $cpis_currency          = trim( $_POST['cpis_currency'] );
             $cpis_language          = trim( $_POST['cpis_language'] );
             
+            if( !empty( $_POST[ 'cpis_layout' ] ) )
+            {
+                $cpis_layout = $cpis_layouts[ $_POST[ 'cpis_layout' ] ];
+                update_option( 'cpis_layout', $cpis_layout );
+            }
+            else
+            {
+                delete_option( 'cpis_layout' );
+                $cpis_layout = array();
+            }
+
             $noptions['paypal'] = array(
                 'activate_paypal'   => ( ( isset( $_POST['cpis_activate_paypal'] ) ) ? true : false ),
                 'activate_sandbox'  => ( ( isset( $_POST['cpis_activate_sandbox'] ) ) ? true : false ),
@@ -799,6 +847,28 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                                 <input type="text" name="cpis_store_url" size="40" value="<?php echo esc_attr( $options[ 'store' ]['store_url'] ); ?>" />
                                 <br />
                                 <em><?php _e( 'Set the URL of page where the store was inserted', CPIS_TEXT_DOMAIN ); ?></em>
+                            </td>
+                        </tr>
+                        <tr valign="top">
+                            <th><?php _e('Store layout', CPIS_TEXT_DOMAIN); ?></th>
+                            <td>
+                                <select name="cpis_layout" id="cpis_layout">
+                                    <option value=""><?php _e( 'Default layout', CPIS_TEXT_DOMAIN ); ?></option>
+                                <?php
+                                    foreach( $cpis_layouts as $id => $layout )
+                                    {
+                                        print '<option value="'.$id.'" '.( ( !empty( $cpis_layout ) && $id == $cpis_layout[ 'id' ] ) ? 'SELECTED' : '' ).' thumbnail="'.$layout[ 'thumbnail' ].'">'.$layout[ 'title' ].'</option>';
+                                    }
+                                ?>
+                                </select>
+                                <div id="cpis_layout_thumbnail">
+                                <?php
+                                    if( !empty( $cpis_layout ) )
+                                    {
+                                        print '<img src="'.$cpis_layout[ 'thumbnail' ].'" title="'.$cpis_layout[ 'title' ].'" />';
+                                    }
+                                ?>
+                                </div>
                             </td>
                         </tr>
                         <tr valign="top">
@@ -1511,6 +1581,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
             $hook == 'image-store_page_image-store-menu-settings'
         ){
             wp_enqueue_style('jquery-style', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/themes/smoothness/jquery-ui.css');
+            wp_enqueue_style('cpis-admin-style', CPIS_PLUGIN_URL.'/css/admin.css');
             wp_enqueue_script('json2');
             wp_enqueue_script('jquery-ui-core');
             wp_enqueue_script('jquery-ui-datepicker');
@@ -1557,6 +1628,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
         if(
             !is_admin()
         ){
+            global $cpis_layout;
             $options = get_option( 'cpis_options' );
             
             wp_enqueue_style('jquery-style', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/themes/smoothness/jquery-ui.css');
@@ -1567,7 +1639,14 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
             wp_enqueue_script('jquery-ui-position');
             wp_enqueue_script('cpis-carousel', CPIS_PLUGIN_URL.'/js/jquery.carouFredSel-6.2.1-packed.js');
             wp_enqueue_script('cpis-script', CPIS_PLUGIN_URL.'/js/public.js', array('jquery', 'json2', 'jquery-ui-core', 'cpis-carousel', 'jquery-ui-position'), null, true);
-                
+            
+            // Load resources of layout
+			if( !empty( $cpis_layout ) )
+			{
+				if( !empty( $cpis_layout[ 'style_file' ] ) )  wp_enqueue_style('cpis-css-layout', $cpis_layout[ 'style_file' ] , array( 'cpis-style' ) );
+				if( !empty( $cpis_layout[ 'script_file' ] ) ) wp_enqueue_script('cpis-js-layout', $cpis_layout[ 'script_file'] , array( 'cpis-script' ), false, true );
+			}
+    
             $cpis_sc_url = _cpis_create_pages( 'cpis-shopping-cart', 'Shopping Cart' );
             $cpis_sc_url .= ( ( strpos( $cpis_sc_url, '?' ) === false ) ? '?' : '&' ).'cpis-action=viewcart';
                     
@@ -1733,8 +1812,16 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
     }
     
     function _cpis_create_select_filter( $name, $option_none, $taxonomy, $hierarchical = 0 ){
+        $page_id = 'cpis_page_'.get_the_ID();
         $option_none = __( $option_none, CPIS_TEXT_DOMAIN );
-        $select = wp_dropdown_categories('name='.$name.'&show_option_none='.$option_none.'&orderby=name&echo=0&taxonomy='.$taxonomy.'&hide_if_empty=1&hierarchical='.$hierarchical.( ( isset( $_SESSION[ $taxonomy ] ) ) ? '&selected='.$_SESSION[ $taxonomy ] : '' ) );
+        
+        if( !is_null( $_SESSION[ $page_id ][ $taxonomy ] ) && !is_numeric( $_SESSION[ $page_id ][ $taxonomy ] ) )
+        {
+           $obj = get_term_by( 'slug', $_SESSION[ $page_id ][ $taxonomy ], $taxonomy );
+           $_SESSION[ $page_id ][ $taxonomy ] = $obj->term_id;
+        }
+        
+        $select = wp_dropdown_categories('name='.$name.'&show_option_none='.$option_none.'&orderby=name&echo=0&taxonomy='.$taxonomy.'&hide_if_empty=1&hierarchical='.$hierarchical.( ( isset( $_SESSION[ $page_id ][ $taxonomy ] ) ) ? '&selected='.$_SESSION[ $page_id ][ $taxonomy ] : '' ) );
         $select = preg_replace("#<select([^>]*)>#", "<select$1 onchange='return this.form.submit()'>", $select);
         return $select;
     }
@@ -1757,6 +1844,9 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
     function cpis_replace_shortcode( $atts, $content, $tag ){
         global $wpdb;
 		
+        $page_id = 'cpis_page_'.get_the_ID();
+        if( !isset( $_SESSION[ $page_id ] ) ) $_SESSION[ $page_id ] = array();
+
         $options = get_option( 'cpis_options' );
         
         // Generated music store
@@ -1767,15 +1857,23 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
         $right = "";
         
         // Set session variable for pagination
-        if( !isset( $_SESSION[ 'cpis_page' ] ) ) $_SESSION[ 'cpis_page' ] = 0;
+        if( !isset( $_SESSION[ $page_id ][ 'cpis_page' ] ) ) $_SESSION[ $page_id ][ 'cpis_page' ] = 0;
         if( isset( $_REQUEST ) && isset( $_REQUEST[ 'cpis_page' ] ) ){
-            $_SESSION[ 'cpis_page' ] = $_REQUEST[ 'cpis_page' ];
+            $_SESSION[ $page_id ][ 'cpis_page' ] = $_REQUEST[ 'cpis_page' ];
         }
         
+        // Create session variables from attributes
+        if( !isset( $_SESSION[ $page_id ][ 'cpis_search_terms' ] ) && !empty( $atts[ 'search' ] ) ) $_SESSION[ $page_id ][ 'cpis_search_terms' ] = $atts[ 'search' ];
+        if( !isset( $_SESSION[ $page_id ][ 'cpis_type' ] ) && !empty( $atts[ 'type' ] ) ) $_SESSION[ $page_id ][ 'cpis_type' ] = $atts[ 'type' ];
+        if( !isset( $_SESSION[ $page_id ][ 'cpis_category' ] ) && !empty( $atts[ 'category' ] ) ) $_SESSION[ $page_id ][ 'cpis_category' ] = $atts[ 'category' ];
+        if( !isset( $_SESSION[ $page_id ][ 'cpis_author' ] ) && !empty( $atts[ 'author' ] ) ) $_SESSION[ $page_id ][ 'cpis_author' ] = $atts[ 'author' ];
+        if( !isset( $_SESSION[ $page_id ][ 'cpis_color' ] ) && !empty( $atts[ 'color' ] ) ) $_SESSION[ $page_id ][ 'cpis_color' ] = $atts[ 'color' ];
+        if( !isset( $_SESSION[ $page_id ][ 'cpis_ordering' ] ) && !empty( $atts[ 'orderby' ] ) ) $_SESSION[ $page_id ][ 'cpis_ordering' ] = $atts[ 'orderby' ];
+
         // Extract search terms
         if( isset( $_REQUEST[ 'search_terms' ] ) ){
-            $_SESSION[ 'cpis_search_terms' ] = $_REQUEST[ 'search_terms' ];
-            $_SESSION[ 'cpis_page' ] = 0;
+            $_SESSION[ $page_id ][ 'cpis_search_terms' ] = $_REQUEST[ 'search_terms' ];
+            $_SESSION[ $page_id ][ 'cpis_page' ] = 0;
             $filter = _cpis_create_search_filter( $_REQUEST[ 'search_terms' ] );
         }else{
             $filter = "";
@@ -1784,43 +1882,43 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
         // Extract product filters
         
         if( isset( $_REQUEST[ 'filter_by_type' ] ) ){
-            $_SESSION[ 'cpis_type' ] = $_REQUEST[ 'filter_by_type' ];
-            $_SESSION[ 'cpis_page' ] = 0;
+            $_SESSION[ $page_id ][ 'cpis_type' ] = $_REQUEST[ 'filter_by_type' ];
+            $_SESSION[ $page_id ][ 'cpis_page' ] = 0;
         }
         
         if( isset( $_REQUEST[ 'filter_by_category' ] ) ){
-            $_SESSION[ 'cpis_category' ] = $_REQUEST[ 'filter_by_category' ];
-            $_SESSION[ 'cpis_page' ] = 0;
+            $_SESSION[ $page_id ][ 'cpis_category' ] = $_REQUEST[ 'filter_by_category' ];
+            $_SESSION[ $page_id ][ 'cpis_page' ] = 0;
         }
         
         if( isset( $_REQUEST[ 'filter_by_author' ] ) ){
-            $_SESSION[ 'cpis_author' ] = $_REQUEST[ 'filter_by_author' ];
-            $_SESSION[ 'cpis_page' ] = 0;
+            $_SESSION[ $page_id ][ 'cpis_author' ] = $_REQUEST[ 'filter_by_author' ];
+            $_SESSION[ $page_id ][ 'cpis_page' ] = 0;
         }
         
         if( isset( $_REQUEST[ 'filter_by_color' ] ) ){
-            $_SESSION[ 'cpis_color' ] = $_REQUEST[ 'filter_by_color' ];
-            $_SESSION[ 'cpis_page' ] = 0;
+            $_SESSION[ $page_id ][ 'cpis_color' ] = $_REQUEST[ 'filter_by_color' ];
+            $_SESSION[ $page_id ][ 'cpis_page' ] = 0;
         }
         
         if( isset( $_REQUEST[ 'ordering_by' ] ) ){
-            $_SESSION[ 'cpis_ordering' ] = $_REQUEST[ 'ordering_by' ];
-            $_SESSION[ 'cpis_page' ] = 0;
+            $_SESSION[ $page_id ][ 'cpis_ordering' ] = $_REQUEST[ 'ordering_by' ];
+            $_SESSION[ $page_id ][ 'cpis_page' ] = 0;
         }else{
-            $_SESSION[ 'cpis_ordering' ] = "post_title";
+            $_SESSION[ $page_id ][ 'cpis_ordering' ] = "post_title";
         }
         
         // Query clauses 
         $_select 	= "SELECT SQL_CALC_FOUND_ROWS DISTINCT posts.ID";
         $_from 		= "FROM ".$wpdb->prefix."posts as posts,".$wpdb->prefix.CPIS_IMAGE." as posts_data"; 
         $_where 	= "WHERE  $filter posts.ID = posts_data.id AND posts.post_status='publish' AND posts.post_type='cpis_image' ";
-        $_order_by 	= "ORDER BY ".( ( $_SESSION['cpis_ordering'] != 'purchases' ) ? "posts" : "posts_data" ).".".$_SESSION['cpis_ordering']." ".( ( $_SESSION['cpis_ordering'] == 'post_title' ) ? "ASC" : "DESC" );
+        $_order_by 	= "ORDER BY ".( ( $_SESSION[ $page_id ]['cpis_ordering'] != 'purchases' ) ? "posts" : "posts_data" ).".".$_SESSION[ $page_id ]['cpis_ordering']." ".( ( $_SESSION[ $page_id ]['cpis_ordering'] == 'post_title' ) ? "ASC" : "DESC" );
         $_limit 	= "";
         
-        if( ( !empty( $_SESSION['cpis_type'] )     && $_SESSION['cpis_type'] != -1 )   ||
-            ( !empty( $_SESSION['cpis_color'] )    && $_SESSION['cpis_color'] != -1 )  ||
-            ( !empty( $_SESSION['cpis_author'] )   && $_SESSION['cpis_author'] != -1 ) || 
-            ( !empty( $_SESSION['cpis_category'] ) && $_SESSION['cpis_category'] != -1 )
+        if( ( !empty( $_SESSION[ $page_id ]['cpis_type'] )     && $_SESSION[ $page_id ]['cpis_type'] != -1 )   ||
+            ( !empty( $_SESSION[ $page_id ]['cpis_color'] )    && $_SESSION[ $page_id ]['cpis_color'] != -1 )  ||
+            ( !empty( $_SESSION[ $page_id ]['cpis_author'] )   && $_SESSION[ $page_id ]['cpis_author'] != -1 ) || 
+            ( !empty( $_SESSION[ $page_id ]['cpis_category'] ) && $_SESSION[ $page_id ]['cpis_category'] != -1 )
         ){
             $_select_sub 	= "SELECT DISTINCT posts.ID";
             
@@ -1830,20 +1928,20 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
             $_where_sub = "$_where AND taxonomy.term_taxonomy_id=term_relationships.term_taxonomy_id AND term_relationships.object_id=posts.ID AND taxonomy.term_id=terms.term_id ";
             
             // Filter by type 
-            if( !empty( $_SESSION['cpis_type'] ) && $_SESSION['cpis_type'] != -1 ){
-                $_where .= " AND posts.ID IN ( $_select_sub $_from_sub $_where_sub AND "._cpis_filter_by_taxonomy( 'cpis_type', $_SESSION['cpis_type'] ).")";
+            if( !empty( $_SESSION[ $page_id ]['cpis_type'] ) && $_SESSION[ $page_id ]['cpis_type'] != -1 ){
+                $_where .= " AND posts.ID IN ( $_select_sub $_from_sub $_where_sub AND "._cpis_filter_by_taxonomy( 'cpis_type', $_SESSION[ $page_id ]['cpis_type'] ).")";
             }
             
-            if( !empty( $_SESSION['cpis_author'] ) && $_SESSION[ 'cpis_author' ] != -1 ){
-                $_where .= " AND posts.ID IN ( $_select_sub $_from_sub $_where_sub AND "._cpis_filter_by_taxonomy( 'cpis_author', $_SESSION['cpis_author'] ).")";
+            if( !empty( $_SESSION[ $page_id ]['cpis_author'] ) && $_SESSION[ $page_id ][ 'cpis_author' ] != -1 ){
+                $_where .= " AND posts.ID IN ( $_select_sub $_from_sub $_where_sub AND "._cpis_filter_by_taxonomy( 'cpis_author', $_SESSION[ $page_id ]['cpis_author'] ).")";
             }
             
-            if( !empty( $_SESSION['cpis_color'] ) && $_SESSION[ 'cpis_color' ] != -1 ){
-                $_where .= " AND posts.ID IN ( $_select_sub $_from_sub $_where_sub AND "._cpis_filter_by_taxonomy( 'cpis_color', $_SESSION['cpis_color'] ).")";
+            if( !empty( $_SESSION[ $page_id ]['cpis_color'] ) && $_SESSION[ $page_id ][ 'cpis_color' ] != -1 ){
+                $_where .= " AND posts.ID IN ( $_select_sub $_from_sub $_where_sub AND "._cpis_filter_by_taxonomy( 'cpis_color', $_SESSION[ $page_id ]['cpis_color'] ).")";
             }
             
-            if( !empty( $_SESSION['cpis_category'] ) && $_SESSION[ 'cpis_category' ] != -1 ){
-                    $_where .= " AND posts.ID IN ( $_select_sub $_from_sub $_where_sub AND "._cpis_filter_by_taxonomy( 'cpis_category', $_SESSION['cpis_category'], true ).")";
+            if( !empty( $_SESSION[ $page_id ]['cpis_category'] ) && $_SESSION[ $page_id ][ 'cpis_category' ] != -1 ){
+                    $_where .= " AND posts.ID IN ( $_select_sub $_from_sub $_where_sub AND "._cpis_filter_by_taxonomy( 'cpis_category', $_SESSION[ $page_id ]['cpis_category'], true ).")";
             }
             
             // End taxonomies
@@ -1852,7 +1950,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
         $query = $_select." ".$_from." ".$_where." ".$_order_by." ".$_limit;
 
         if( $options[ 'store' ][ 'show_pagination' ] && is_numeric( $options[ 'store' ][ 'items_page' ] ) &&  $options[ 'store' ][ 'items_page' ] > 1 ){
-            $page = $_SESSION[ 'cpis_page' ];
+            $page = $_SESSION[ $page_id ][ 'cpis_page' ];
             
             $_limit = "LIMIT ".( $page * $options[ 'store' ][ 'items_page' ]).", ".$options[ 'store' ][ 'items_page' ];
             
@@ -1919,7 +2017,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                 $left .= "<div class='cpis-column-title'>".__('Search by', CPIS_TEXT_DOMAIN)."</div>";    
                 $left .= "
                 <div class='cpis-filter'>
-                    <input type='search' name='search_terms' placeholder='".__( 'Search...', CPIS_TEXT_DOMAIN )."' value='".( ( isset( $_SESSION[ 'cpis_search_terms' ] ) ) ? $_SESSION[ 'cpis_search_terms' ] : '' )."' style='width:100%;' />
+                    <input type='search' name='search_terms' placeholder='".__( 'Search...', CPIS_TEXT_DOMAIN )."' value='".( ( isset( $_SESSION[ $page_id ][ 'cpis_search_terms' ] ) ) ? $_SESSION[ $page_id ][ 'cpis_search_terms' ] : '' )."' style='width:100%;' />
                 </div>
                 ";
             }    
@@ -1983,9 +2081,9 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                                     __('Order by: ', CPIS_TEXT_DOMAIN).
                         "
                                     <select id='ordering_by' name='ordering_by' onchange='this.form.submit();'>
-                                        <option value='post_title' ".( ( $_SESSION[ 'cpis_ordering' ] == 'post_title') ? "SELECTED" : "").">".__( 'Title', CPIS_TEXT_DOMAIN )."</option>
-                                        <option value='purchases' ".( ( $_SESSION['cpis_ordering'] == 'purchases' ) ? "SELECTED" : "" ).">".__( 'Popularity', CPIS_TEXT_DOMAIN )."</option>
-                                        <option value='post_date' ".( ( $_SESSION['cpis_ordering'] == 'post_date') ? "SELECTED" : "" ).">".__( 'Date', CPIS_TEXT_DOMAIN )."</option>
+                                        <option value='post_title' ".( ( $_SESSION[ $page_id ][ 'cpis_ordering' ] == 'post_title') ? "SELECTED" : "").">".__( 'Title', CPIS_TEXT_DOMAIN )."</option>
+                                        <option value='purchases' ".( ( $_SESSION[ $page_id ]['cpis_ordering'] == 'purchases' ) ? "SELECTED" : "" ).">".__( 'Popularity', CPIS_TEXT_DOMAIN )."</option>
+                                        <option value='post_date' ".( ( $_SESSION[ $page_id ]['cpis_ordering'] == 'post_date') ? "SELECTED" : "" ).">".__( 'Date', CPIS_TEXT_DOMAIN )."</option>
                                     </select>
                                 </form>
                             </div>
@@ -2001,7 +2099,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
             <div class='cpis-image-store-right'>
         ".$header.$top_ten_carousel;
         
-        $width = floor( (100 - 2*( min( $options[ 'store' ][ 'columns' ], max( count( $results ), 1 ) ) -1 ) )/min( $options[ 'store' ][ 'columns' ], max( count( $results ), 1 ) ) ) - 1;
+        $width = (100 - 2*( min( $options[ 'store' ][ 'columns' ], max( count( $results ), 1 ) ) -1 ) )/min( $options[ 'store' ][ 'columns' ], max( count( $results ), 1 ) )  - 1;
         
         $right .= "<div class='cpis-image-store-items'>";
         $item_counter = 0;

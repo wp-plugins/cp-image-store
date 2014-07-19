@@ -621,6 +621,7 @@ if( !function_exists( 'cpis_save_image' ) ){
             break;
             
             case 'multiple':
+                if( isset( $data_arr[ 'description' ] ) ) $data_arr[ 'description' ] = wp_trim_words( strip_shortcodes( $data_arr[ 'description' ] ) );
                 if( $options[ 'display' ][ 'preview' ] ) $data_arr[ 'preview' ] = true;
                 if( $output == 'echo' )
                     print cpis_print_multiple( $data_arr );
@@ -629,6 +630,7 @@ if( !function_exists( 'cpis_save_image' ) ){
             break;
             
             case 'store':
+                if( isset( $data_arr[ 'description' ] ) ) $data_arr[ 'description' ] = wp_trim_words( strip_shortcodes( $data_arr[ 'description' ] ) );
                 if( $options[ 'display' ][ 'preview' ] ) $data_arr[ 'preview' ] = true;
                 if( $output == 'echo' )
                     print cpis_print_store( $data_arr );

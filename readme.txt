@@ -22,6 +22,7 @@ CP Image Store with Slideshow features:
       publication date
     § Associate various features to pictures: author, type of image, 
       color scheme, and categories
+    § Allows select an alternative layout of the store design
     § Allows to insert a particular image in posts or pages, and as widget 
       on website's sidebars
     § Allows sharing image pages in social networks (ex: Facebook, Twitter, Google+)
@@ -99,6 +100,7 @@ The setup interface includes the following fields:
 This section contains the setup options for the CP Image Store with Slideshow.
 
 *   URL of Store page: Enter the URL of the web page where the CP Image Store with Slideshow was inserted. The URL of the store will be used to enable return from the product page to the store page.
+*   Store layout: Allows select the layout to use in the stores page.
 *   Display a search box: Inserts a search box in the web page of the CP Image Store with Slideshow to search images by texts
 *   Allow filtering by type: Inserts a field in the web page of the CP Image Store with Slideshow to filter images by type (possible types of images: Clip Art, Photo, Draws, Vectors, etc.)
 *   Allow filtering by color: Inserts a field in the web page of the CP Image Store with Slideshow to filter the products by their color scheme (color schemes possible: Full color, Black and White, Sepia, etc.).
@@ -205,7 +207,15 @@ The CP Image Store with Slideshow can be posted on a page or post in WordPress. 
 
 The image store adds two new icons on the post / page content editor. The first of the icons serves to insert the CP Image Store with Slideshow, the second - to insert a particular image.
 
-The button for the insertion of the CP Image Store with Slideshow creates a shortcode in the content of the post / page in the form: [CodePeople-image-store]
+The button for the insertion of the CP Image Store with Slideshow creates a shortcode in the content of the post / page in the form: [codepeople-image-store]
+
+The shortcode accepts a group of attributes to determine the products to display in the form by default (after display the store on page its products can vary if are modified the options for filtering)
+
+search: Display the images with the term in the image description, or title. [codepeople-image-store search="people"]
+type: Accepts the slug of image type, and display the images associated with this type. [codepeople-image-store type="clip-art"]
+color: Accepts the slug of color, and display the images associated with this color. [codepeople-image-store color="full-color"]
+author: Accepts the slug of image author, and display the images that belong to the author. [codepeople-image-store author="photographer-name"]
+category: Accepts the slug of category, and display the images that belong to the category. [codepeople-image-store category="category-name"]
 
 The button for inserting an image allows to enter the ID of the image and select the layout of the product to be displayed.
 
@@ -281,3 +291,4 @@ A: To use this feature be sure the libraries to create ZIP files are available i
 7. Available Widgets to Insert an Image or Image List on Website's Sidebars
 8. Sales Reports
 9. Filtering Sales Report
+10. Alternative layout
