@@ -435,7 +435,7 @@ if( !function_exists( 'cpis_init_taxonomies' ) ){
 } // End cpis_init_taxonomies
 
 // The plugin ini
-add_action('init', 'cpis_init', 0);
+add_action('init', 'cpis_init', 1);
 if( !function_exists( 'cpis_init' ) ){
     function cpis_init(){
         global $cpis_layout;
@@ -523,7 +523,7 @@ if( !function_exists( 'cpis_footer' ) ){
     }
 }
         
-add_action('admin_init', 'cpis_admin_init', 0);
+add_action('admin_init', 'cpis_admin_init', 1);
 if( !function_exists( 'cpis_admin_init' ) ){
     
     function _cpis_create_pages( $slug, $title ){
