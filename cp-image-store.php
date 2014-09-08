@@ -170,69 +170,73 @@ if( !function_exists( 'cpis_default_options' ) ){
 
 if( !function_exists( 'cpis_create_db' ) ){
     function cpis_create_db(){
-        global $wpdb;
-			
-        if( !empty( $_SESSION[ 'cpis_created_db' ] ) )
-		{
-			return;
-		}	
-		
-		$_SESSION[ 'cpis_created_db' ] = true;
-			
-		$sql = "CREATE TABLE IF NOT EXISTS ".$wpdb->prefix.CPIS_IMAGE." (
-            id mediumint(9) NOT NULL,
-            purchases mediumint(9) NOT NULL DEFAULT 0,
-            preview TEXT,
-            UNIQUE KEY id (id)
-         );";             
-        $wpdb->query($sql); 
-        
-        $sql = "CREATE TABLE IF NOT EXISTS ".$wpdb->prefix.CPIS_FILE." (
-            id mediumint(9) NOT NULL AUTO_INCREMENT,
-            path VARCHAR(255) NOT NULL,
-            url VARCHAR(255) NOT NULL,
-            width FLOAT,
-            height FLOAT,
-            price FLOAT,
-            UNIQUE KEY id (id)
-         );";             
-        $wpdb->query($sql); 
-        
-        $sql = "CREATE TABLE IF NOT EXISTS ".$wpdb->prefix.CPIS_IMAGE_FILE." (
-            id_image mediumint(9) NOT NULL,
-            id_file mediumint(9) NOT NULL,
-            UNIQUE KEY (id_image, id_file)
-         );";             
-        $wpdb->query($sql); 
-        
-        
-        $sql = "CREATE TABLE IF NOT EXISTS ".$wpdb->prefix.CPIS_PURCHASE." (
-            id mediumint(9) NOT NULL AUTO_INCREMENT,
-            product_id mediumint(9) NOT NULL,
-            purchase_id varchar(50) NOT NULL,
-            date DATETIME NOT NULL,
-			checking_date DATETIME,
-            email VARCHAR(255) NOT NULL,
-            amount FLOAT NOT NULL DEFAULT 0,
-            downloads INT NOT NULL DEFAULT 0,
-            paypal_data TEXT,
-            note TEXT,
-            UNIQUE KEY id (id)
-         );";             
-        $wpdb->query($sql); 
-		
-		$result = $wpdb->get_results("SHOW COLUMNS FROM ".$wpdb->prefix.CPIS_PURCHASE." LIKE 'checking_date'");
-		if(empty($result)){
-			$sql = "ALTER TABLE ".$wpdb->prefix.CPIS_PURCHASE." ADD checking_date DATETIME";
-			$wpdb->query($sql);
-		}    
-        
-		$result = $wpdb->get_results("SHOW COLUMNS FROM ".$wpdb->prefix.CPIS_PURCHASE." LIKE 'downloads'");
-		if(empty($result)){
-			$sql = "ALTER TABLE ".$wpdb->prefix.CPIS_PURCHASE." ADD downloads INT NOT NULL DEFAULT 0";
-			$wpdb->query($sql);
-		}    
-            	
+        try{
+            global $wpdb;
+                
+            if( !empty( $_SESSION[ 'cpis_created_db' ] ) )
+            {
+                return;
+            }	
+            
+            $_SESSION[ 'cpis_created_db' ] = true;
+                
+            $sql = "CREATE TABLE IF NOT EXISTS ".$wpdb->prefix.CPIS_IMAGE." (
+                id mediumint(9) NOT NULL,
+                purchases mediumint(9) NOT NULL DEFAULT 0,
+                preview TEXT,
+                UNIQUE KEY id (id)
+             );";             
+            $wpdb->query($sql); 
+            
+            $sql = "CREATE TABLE IF NOT EXISTS ".$wpdb->prefix.CPIS_FILE." (
+                id mediumint(9) NOT NULL AUTO_INCREMENT,
+                path VARCHAR(255) NOT NULL,
+                url VARCHAR(255) NOT NULL,
+                width FLOAT,
+                height FLOAT,
+                price FLOAT,
+                UNIQUE KEY id (id)
+             );";             
+            $wpdb->query($sql); 
+            
+            $sql = "CREATE TABLE IF NOT EXISTS ".$wpdb->prefix.CPIS_IMAGE_FILE." (
+                id_image mediumint(9) NOT NULL,
+                id_file mediumint(9) NOT NULL,
+                UNIQUE KEY (id_image, id_file)
+             );";             
+            $wpdb->query($sql); 
+            
+            
+            $sql = "CREATE TABLE IF NOT EXISTS ".$wpdb->prefix.CPIS_PURCHASE." (
+                id mediumint(9) NOT NULL AUTO_INCREMENT,
+                product_id mediumint(9) NOT NULL,
+                purchase_id varchar(50) NOT NULL,
+                date DATETIME NOT NULL,
+                checking_date DATETIME,
+                email VARCHAR(255) NOT NULL,
+                amount FLOAT NOT NULL DEFAULT 0,
+                downloads INT NOT NULL DEFAULT 0,
+                paypal_data TEXT,
+                note TEXT,
+                UNIQUE KEY id (id)
+             );";             
+            $wpdb->query($sql); 
+            
+            $result = $wpdb->get_results("SHOW COLUMNS FROM ".$wpdb->prefix.CPIS_PURCHASE." LIKE 'checking_date'");
+            if(empty($result)){
+                $sql = "ALTER TABLE ".$wpdb->prefix.CPIS_PURCHASE." ADD checking_date DATETIME";
+                $wpdb->query($sql);
+            }    
+            
+            $result = $wpdb->get_results("SHOW COLUMNS FROM ".$wpdb->prefix.CPIS_PURCHASE." LIKE 'downloads'");
+            if(empty($result)){
+                $sql = "ALTER TABLE ".$wpdb->prefix.CPIS_PURCHASE." ADD downloads INT NOT NULL DEFAULT 0";
+                $wpdb->query($sql);
+            }    
+        }
+        catch( Exception $exp )
+        {
+        }
 	}
 } // End cpis_create_db
 
