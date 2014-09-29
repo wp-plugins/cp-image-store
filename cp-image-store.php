@@ -2173,7 +2173,19 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
 		$options = get_option( 'cpis_options' );
 		$valid_download = ( !empty( $options[ 'store' ][ 'download_link' ] ) ) ? $options[ 'store' ][ 'download_link' ] : 3 ;
 		if( is_null( $data ) ){
-			cpis_setError( 'There is no product associated with the entered data' );
+			if( !isset( $_REQUEST[ 'timeout' ] ) )
+            {
+                cpis_setError(
+                    '<div id="cpis_error_mssg"></div>
+                    <script>
+                        var timeout_text = "'.__( 'The store is processing the purchase. You will be redirected in', CPIS_TEXT_DOMAIN ).'";
+                    </script>'
+                );
+            }
+            else
+            {
+                cpis_setError( 'There is no product associated with the entered data' );
+            }    
 			return false;
 		}elseif( $valid_download < $data->days ){ 
 			cpis_setError( 'The download link has expired, please contact to the vendor' );

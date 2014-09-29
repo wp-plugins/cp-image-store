@@ -140,4 +140,25 @@
             );
         }
     );    
+    
+    timeout_counter = 10;
+    window['cpis_counting'] = function()
+    {
+        var loc = document.location.href;
+        document.getElementById( "cpis_error_mssg" ).innerHTML = timeout_text+' '+timeout_counter;
+        if( timeout_counter == 0 )
+        {
+            document.location = loc+( ( loc.indexOf( '?' ) == -1 ) ? '?' : '&' )+'timeout=1';    
+        }
+        else
+        {
+            timeout_counter--;
+            setTimeout( cpis_counting, 1000 );
+        }    
+    };
+    
+    if( $( '[id="cpis_error_mssg"]' ).length ) 
+    {
+        cpis_counting();
+    }
 });
