@@ -281,6 +281,26 @@ A: Please, go to the settings page of Image Store, and be sure that email associ
 
 A: To use this feature be sure the libraries to create ZIP files are available in the PHP script installed in your web server. Furthermore, if the customers bought multiple files at same time, and the sum of size of all files purchased is bigger than memory assigned to the PHP, then is not possible to create the zip file.
 
+= Q: How can be selected the images to display in the store by default? =
+
+A: The images store is inserted in a page through the shortcode: [codepeople-image-store], but it is possible define some parameters in the shortcode for filtering the images that will be displayed by default in the store:
+
+type: allows display in the store the images with the "type" defined as attribute of the shortcode. The "type" attribute accepts the slug of the type or its ID.
+
+        [codepeople-image-store type="clip-art"]        
+    
+author: allows display in the store the images crated by the "author" defined as attribute of the shortcode. The "author" attribute accepts the slug of the author or its ID.
+
+        [codepeople-image-store author="author-name"]        
+    
+color: allows display in the store the images with the colour schema defined by the "color" attribute. The "color" attribute accepts the slug of the color or its ID.
+
+        [codepeople-image-store author="full-color"]        
+    
+category: allows display in the store the images belonging to the category defined as attribute of the shortcode. The "category" attribute accepts the slug of the category or its ID.
+
+        [codepeople-image-store category="category-name"]        
+    
 == Screenshots ==
 1. Image Store
 2. Images List
