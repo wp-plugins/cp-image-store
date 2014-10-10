@@ -312,3 +312,26 @@ category: allows display in the store the images belonging to the category defin
 8. Sales Reports
 9. Filtering Sales Report
 10. Alternative layout
+
+== Changelog ==
+
+= 1.0 =
+
+* First version released.
+
+= 1.0.1 =
+
+* Improves the plugin documentation.
+* Corrects an issue with language files.
+* Displays the carousel with any number of images.
+* Corrects a compatibility issue with the "Search in place" plugin.
+* Includes a search box in the store's page.
+* Corrects an issue in the creation of thumbnails from images in PNG format.
+* Increases the security in the store.
+* Includes the use of charts in the sales reports.
+* Includes the product ID in the list of images for selling.
+* Corrects the store's design in themes with responsive designs.
+* Allows limit the number of downloads by download link.
+* Allows reset the number of downloads, and the download interval.
+* Changes the location of the upload files.
+* Includes alternative layouts.
