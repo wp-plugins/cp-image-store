@@ -1981,8 +1981,10 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
         }
         
         // Create carousel
-        if( $options[ 'display' ][ 'carousel' ][ 'activate' ] ){
-            
+        if( 
+            ( isset( $atts[ 'carousel' ] ) && $atts[ 'carousel' ] * 1 ) ||  
+            ( !isset( $atts[ 'carousel' ] ) && $options[ 'display' ][ 'carousel' ][ 'activate' ] ) 
+        ){
             $thumb_width  = $options[ 'image' ][ 'thumbnail' ][ 'width' ];
             $thumb_height = $options[ 'image' ][ 'thumbnail' ][ 'height' ];
             
@@ -2004,13 +2006,18 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
         }    
         
         // Create filters and sorting fields
+        $_show_search_box   = ( isset( $atts[ 'show_search_box' ] ) ) ? $atts[ 'show_search_box' ] * 1 : $options[ 'store' ][ 'show_search_box' ];
+        $_show_type_filters = ( isset( $atts[ 'show_type_filters' ] ) ) ? $atts[ 'show_type_filters' ] * 1 : $options[ 'store' ][ 'show_type_filters' ];
+        $_show_color_filters = ( isset( $atts[ 'show_color_filters' ] ) ) ? $atts[ 'show_color_filters' ] * 1 : $options[ 'store' ][ 'show_color_filters' ];
+        $_show_author_filters = ( isset( $atts[ 'show_author_filters' ] ) ) ? $atts[ 'show_author_filters' ] * 1 : $options[ 'store' ][ 'show_author_filters' ];
+        $_show_category_filters = ( isset( $atts[ 'show_category_filters' ] ) ) ? $atts[ 'show_category_filters' ] * 1 : $options[ 'store' ][ 'show_category_filters' ];
         
         // Create filter section
-        if( $options[ 'store' ][ 'show_search_box' ] || 
-            $options[ 'store' ][ 'show_type_filters' ] || 
-            $options[ 'store' ][ 'show_color_filters' ] || 
-            $options[ 'store' ][ 'show_author_filters' ] ||
-            $options[ 'store' ][ 'show_category_filters' ] ||
+        if( $_show_search_box || 
+            $_show_type_filters || 
+            $_show_color_filters || 
+            $_show_author_filters ||
+            $_show_category_filters ||
             !empty( $options[ 'image' ][ 'license' ][ 'description' ] )
         ){
             $left .= "
@@ -2018,7 +2025,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                         <form method='post' data-ajax='false'>
                 ";
             
-            if( $options[ 'store' ][ 'show_search_box' ] ){
+            if( $_show_search_box ){
                 $left .= "<div class='cpis-column-title'>".__('Search by', CPIS_TEXT_DOMAIN)."</div>";    
                 $left .= "
                 <div class='cpis-filter'>
@@ -2026,24 +2033,33 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                 </div>
                 ";
             }    
-    
-            $left .= "<div class='cpis-column-title'>".__('Filter by', CPIS_TEXT_DOMAIN)."</div>";
-            if( $options[ 'store' ][ 'show_type_filters' ] ){
+            
+            if(
+                $_show_type_filters || 
+                $_show_color_filters || 
+                $_show_author_filters ||
+                $_show_category_filters
+            )
+            {
+                $left .= "<div class='cpis-column-title'>".__('Filter by', CPIS_TEXT_DOMAIN)."</div>";
+            }
+            
+            if( $_show_type_filters ){
                 $str = _cpis_create_select_filter( 'filter_by_type', 'All images', 'cpis_type' );
                 if( !empty( $str ) ) $left .= "<div class='cpis-filter'><label>".__(' type: ', CPIS_TEXT_DOMAIN)."</label>$str</div>";
             }
             
-            if( $options[ 'store' ][ 'show_color_filters' ] ){
+            if( $_show_color_filters ){
                 $str = _cpis_create_select_filter( 'filter_by_color', 'All color schemes', 'cpis_color' );
                 if( !empty( $str ) ) $left .= "<div class='cpis-filter'><label>".__(' color scheme: ', CPIS_TEXT_DOMAIN)."</label>$str</div>";
             }
             
-            if( $options[ 'store' ][ 'show_author_filters' ] ){
+            if( $_show_author_filters ){
                 $str = _cpis_create_select_filter( 'filter_by_author', 'All authors', 'cpis_author' );
                 if( !empty( $str ) ) $left .= "<div class='cpis-filter'><label>".__(' authors: ', CPIS_TEXT_DOMAIN)."</label>$str</div>";
             }
             
-            if( $options[ 'store' ][ 'show_category_filters' ] ){
+            if( $_show_category_filters ){
                 $str = _cpis_create_select_filter( 'filter_by_category', 'All categories', 'cpis_category', 1 );
                 if( !empty( $str ) ) $left .= "<div class='cpis-filter'><label>".__(' categories: ', CPIS_TEXT_DOMAIN)."</label>$str</div>";
             }
@@ -2074,10 +2090,12 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
         }
         
         // Create header
-        if( $options[ 'store' ][ 'show_ordering' ] ){
+        $_show_ordering = ( isset( $atts[ 'show_ordering' ] ) ) ? $atts[ 'show_ordering' ] * 1 : $options[ 'store' ][ 'show_ordering' ];
+        
+        if( $_show_ordering ){
             $header .= "<div class='cpis-image-store-header'>";
             
-            if( $options[ 'store' ][ 'show_ordering' ] ){
+            if( $_show_ordering ){
                 // Create sorting
                 $header .= "
                             <div class='cpis-image-store-ordering'>

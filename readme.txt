@@ -216,6 +216,13 @@ type: Accepts the slug of image type, and display the images associated with thi
 color: Accepts the slug of color, and display the images associated with this color. [codepeople-image-store color="full-color"]
 author: Accepts the slug of image author, and display the images that belong to the author. [codepeople-image-store author="photographer-name"]
 category: Accepts the slug of category, and display the images that belong to the category. [codepeople-image-store category="category-name"]
+carousel: Displays or hides the images carousel in the store's page. Values allowed 1 or 0. [codepeople-image-store carousel="1"]
+show_search_box: Displays or hides the search box in the store's page. Values allowed 1 or 0. [codepeople-image-store show_search_box="1"]
+show_type_filters: Displays or hides the option for filtering the images for type in the store's page. Values allowed 1 or 0. [codepeople-image-store show_type_filters="1"]
+show_color_filters: Displays or hides the option for filtering the images for colors in the store's page. Values allowed 1 or 0. [codepeople-image-store show_color_filters="1"]
+show_author_filters: Displays or hides the option for filtering the images for author in the store's page. Values allowed 1 or 0. [codepeople-image-store show_author_filters="1"]
+show_category_filters: Displays or hides the option for filtering the images for category in the store's page. Values allowed 1 or 0. [codepeople-image-store show_category_filters="1"]
+show_ordering: Displays or hides the box for ordering the images in the store's page. Values allowed 1 or 0. [codepeople-image-store show_ordering="1"]
 
 The button for inserting an image allows to enter the ID of the image and select the layout of the product to be displayed.
 
