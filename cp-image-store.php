@@ -1873,8 +1873,12 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
         if( !isset( $_SESSION[ $page_id ][ 'cpis_category' ] ) && !empty( $atts[ 'category' ] ) ) $_SESSION[ $page_id ][ 'cpis_category' ] = $atts[ 'category' ];
         if( !isset( $_SESSION[ $page_id ][ 'cpis_author' ] ) && !empty( $atts[ 'author' ] ) ) $_SESSION[ $page_id ][ 'cpis_author' ] = $atts[ 'author' ];
         if( !isset( $_SESSION[ $page_id ][ 'cpis_color' ] ) && !empty( $atts[ 'color' ] ) ) $_SESSION[ $page_id ][ 'cpis_color' ] = $atts[ 'color' ];
-        if( !isset( $_SESSION[ $page_id ][ 'cpis_ordering' ] ) && !empty( $atts[ 'orderby' ] ) ) $_SESSION[ $page_id ][ 'cpis_ordering' ] = $atts[ 'orderby' ];
-
+        if( !isset( $_SESSION[ $page_id ][ 'cpis_ordering' ] ) )
+        {
+            if( !empty( $atts[ 'orderby' ] ) ) $_SESSION[ $page_id ][ 'cpis_ordering' ] = $atts[ 'orderby' ];
+            else $_SESSION[ $page_id ][ 'cpis_ordering' ] = "post_title";
+        }
+        
         // Extract search terms
         if( isset( $_REQUEST[ 'search_terms' ] ) ){
             $_SESSION[ $page_id ][ 'cpis_search_terms' ] = $_REQUEST[ 'search_terms' ];
@@ -1909,8 +1913,6 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
         if( isset( $_REQUEST[ 'ordering_by' ] ) ){
             $_SESSION[ $page_id ][ 'cpis_ordering' ] = $_REQUEST[ 'ordering_by' ];
             $_SESSION[ $page_id ][ 'cpis_page' ] = 0;
-        }else{
-            $_SESSION[ $page_id ][ 'cpis_ordering' ] = "post_title";
         }
         
         // Query clauses 

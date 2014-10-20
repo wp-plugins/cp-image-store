@@ -223,7 +223,8 @@ The shortcode accepts a group of attributes to determine the products to display
 * show_author_filters: Displays or hides the option for filtering the images for author in the store's page. Values allowed 1 or 0. [codepeople-image-store show_author_filters="1"]
 * show_category_filters: Displays or hides the option for filtering the images for category in the store's page. Values allowed 1 or 0. [codepeople-image-store show_category_filters="1"]
 * show_ordering: Displays or hides the box for ordering the images in the store's page. Values allowed 1 or 0. [codepeople-image-store show_ordering="1"]
-
+* orderby: The values allowed are: purchases, post_title, post_date. Allows ordering the products in the store's page by the criteria defined in the attribute.[codepeople-image-store orderby="post_date"]
+        
 The button for inserting an image allows to enter the ID of the image and select the layout of the product to be displayed.
 
 **Publishing a particular image**
