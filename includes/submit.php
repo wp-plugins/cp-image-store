@@ -70,7 +70,7 @@
             '<input type="hidden" name="page_style" value="Primary" />'.
             '<input type="hidden" name="no_shipping" value="1" />'.
             '<input type="hidden" name="no_note" value="1" />'.
-            '<input type="hidden" name="bn" value="PP-BuyNowBF" />'.
+            '<input type="hidden" name="bn" value="NetFactorSL_SI_Custom" />'.
             '<input type="hidden" name="ipn_test" value="1" />'.
             '</form>'.
             '<script type="text/javascript">document.ppform'.$randval.'.submit();'.'</script>';
