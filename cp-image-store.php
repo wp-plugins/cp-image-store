@@ -2224,9 +2224,10 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
 			return false;
 		}
 
-		if( isset( $_REQUEST[ 'f' ] ) )
+		if( isset( $_REQUEST[ 'f' ] ) && !isset( $_SESSION[ 'cpis_donwloads' ] ) )
 		{
-			$wpdb->query( $wpdb->prepare( 'UPDATE '.$wpdb->prefix.CPIS_PURCHASE.' SET downloads=downloads+1 WHERE id=%d', $data->id ) );
+			$_SESSION[ 'cpis_donwloads' ] = 1;
+            $wpdb->query( $wpdb->prepare( 'UPDATE '.$wpdb->prefix.CPIS_PURCHASE.' SET downloads=downloads+1 WHERE id=%d', $data->id ) );
 		}
 		
 		return true;
