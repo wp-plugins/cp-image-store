@@ -70,7 +70,7 @@ if( !function_exists( 'cpis_install' ) ){
 				$old_blog = $wpdb->blogid;
                 
                 // Get all blog ids
-                $blogids = $wpdb->get_col($wpdb->prepare("SELECT blog_id FROM $wpdb->blogs"));
+                $blogids = $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs" );
                 foreach ($blogids as $blog_id) {
                     switch_to_blog($blog_id);
                     
@@ -78,7 +78,7 @@ if( !function_exists( 'cpis_install' ) ){
                     cpis_default_options();
                 
                     // Create database structure
-                    cpis_create_db();
+                    cpis_create_db( true );
                 }
                 
                 switch_to_blog($old_blog);
@@ -87,10 +87,25 @@ if( !function_exists( 'cpis_install' ) ){
 		}
 		
         cpis_default_options();
-        cpis_create_db();
+        cpis_create_db( true );
 		
 	} // End cpis_install
 } // End plugin activation
+
+// A new blog has been created in a multisite WordPress
+add_action( 'wpmu_new_blog', 'cpis_install_new_blog', 10, 6);        
+ 
+function cpis_install_new_blog($blog_id, $user_id, $domain, $path, $site_id, $meta ) {
+    global $wpdb;
+	if ( is_plugin_active_for_network() ) 
+	{
+        $current_blog = $wpdb->blogid;
+        switch_to_blog( $blog_id );
+		cpis_default_options();
+        cpis_create_db( true );
+        switch_to_blog( $current_blog );
+    }
+}
 
 if( !function_exists( 'cpis_default_options' ) ){
     function cpis_default_options(){
@@ -169,11 +184,11 @@ if( !function_exists( 'cpis_default_options' ) ){
 } // End cpis_default_options
 
 if( !function_exists( 'cpis_create_db' ) ){
-    function cpis_create_db(){
+    function cpis_create_db( $installing = false ){
         try{
             global $wpdb;
                 
-            if( !empty( $_SESSION[ 'cpis_created_db' ] ) )
+            if( !$installing && !empty( $_SESSION[ 'cpis_created_db' ] ) )
             {
                 return;
             }	
