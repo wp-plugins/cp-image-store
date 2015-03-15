@@ -2,9 +2,9 @@
 Contributors: codepeople
 Donate link: http://wordpress.dwbooster.com/content-tools/image-store
 Tags:sell pictures,gallery,galleries,image store,paypal,photo store,slideshow,photo gallery,photography,photos,sell digital print,sell images,sell photo,sell photos,photo selling,images,image,photos,pictures,clipart,sell clipart,vector,e-commerce,ecommerce,facebook,google,google+,html5,carousel,shop,social,social network,store,twitter,discounts,post,posts,page,widget,plugin,admin,shortcode,comments,sidebar
-Requires at least: 3.0.5
+Requires at least: 3.5.0
 Tested up to: 4.1
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -343,3 +343,17 @@ category: allows display in the store the images belonging to the category defin
 * Allows reset the number of downloads, and the download interval.
 * Changes the location of the upload files.
 * Includes alternative layouts.
+
+= 1.0.2 =
+
+* Allows to distribute images for free. The images without a price defined, or if the PayPal option is disabled in the store's settings, appear download links beside the images,
+* Uses functions included since WordPress 3.5.0, that modifies the requirements.
+
+== Upgrade Notice ==
+
+= 1.0.2 =
+
+* Allows to distribute images for free. The images without a price defined, or if the PayPal option is disabled in the store's settings, appear download links beside the images,
+* Uses functions included since WordPress 3.5.0, that modifies the requirements.
+
+Important note: If you are using the Professional version don't update via the WP dashboard but using your personal update link. Contact us if you need further information: http://wordpress.dwbooster.com/support

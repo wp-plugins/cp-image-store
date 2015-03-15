@@ -595,18 +595,27 @@ if( !function_exists( 'cpis_save_image' ) ){
             
             $files = $wpdb->get_results( $wpdb->prepare( "SELECT file.* FROM ".$wpdb->prefix.CPIS_FILE." AS file, ".$wpdb->prefix.CPIS_IMAGE_FILE." AS image_file WHERE file.id=image_file.id_file AND image_file.id_image=%d", $id ) );
             
-            if( !empty( $files ) && $options[ 'paypal' ][ 'activate_paypal' ] ){
+            if( !empty( $files ) ){
                 $data_arr[ 'file' ] = __( 'Image Version(s): ', CPIS_TEXT_DOMAIN );
                 $data_arr[ 'file' ] .= '<ul>';
+				$tmp_price_sum = 0;
                 foreach( $files as $file ){
-                    $data_arr[ 'file' ] .= '<li><input type="checkbox" name="image_file[]" value="'.$file->id.'" /> <span class="cpis-image-size">['.$file->width.' x '.$file->height.' '.$options[ 'image' ][ 'unit' ].']</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cpis-image-price">'.$options[ 'paypal' ][ 'currency_symbol' ].sprintf("%.2f", $file->price).' '.$options[ 'paypal' ][ 'currency' ].'</span></li>';
+					$tmp_price_sum += floatval( $file->price );
+					
+                    $data_arr[ 'file' ] .= '<li><span style="width:20px;display:inline-block;">'.( ( $options[ 'paypal' ][ 'activate_paypal' ] &&  !empty( $file->price ) ) ? '<input type="checkbox" name="image_file[]" value="'.$file->id.'" />' : '' ).'</span><span class="cpis-image-size">['.$file->width.' x '.$file->height.' '.$options[ 'image' ][ 'unit' ].']</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cpis-image-price">'.( ( $options[ 'paypal' ][ 'activate_paypal' ] &&  !empty( $file->price ) ) ? $options[ 'paypal' ][ 'currency_symbol' ].sprintf("%.2f", $file->price).' '.$options[ 'paypal' ][ 'currency' ] : '<a href="'.$file->url.'" target="_blank">'.__( 'download', CPIS_TEXT_DOMAIN ).'</a>' ).'</span></li>';
+					
                 }
                 $data_arr[ 'file' ] .= '</ul>';
-                
+
                 // Set the buy now button
                 // Check for shopping cart
                 $data_arr[ 'submit' ] = CPIS_H_URL.'?cpis-action=buynow';
                 $data_arr[ 'button' ] = '<input type="button" id="cpis-paypal-button" class="cpis-paypal-button" value="'.__( 'Buy Now', CPIS_TEXT_DOMAIN ).'" onclick="cpis_buynow(this);" />';
+				
+				if( !$options[ 'paypal' ][ 'activate_paypal' ] || $tmp_price_sum == 0 )
+				{
+					$data_arr[ 'button' ] = '';
+				}
             }
             
         }
