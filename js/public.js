@@ -88,7 +88,8 @@
             
             var c = $('[id="cpis-image-store-carousel"]');
             if( c.length ){
-                var li = c.find( 'li' );
+				c.css( 'visibility', 'hidden' );
+				var li = c.find( 'li' );
                 if( li.length ){
                     var l = $('<div class="cpis-carousel-left" style="" ></div>'),
                         r = $('<div class="cpis-carousel-right" style="" ></div>'),
@@ -106,14 +107,20 @@
                         _auto = { pauseOnHover: 'resume' };
                     }            
                     
-                    u.carouFredSel({
-                        width: '100%',
-                        height: 'auto',
-                        prev: '.cpis-carousel-left',
-                        next: '.cpis-carousel-right',
-                        auto: _auto
-                    });
-                        
+					setTimeout(
+						function()
+						{
+							c.css( 'visibility', 'visible' );
+							u.carouFredSel({
+								width: '100%',
+								height: 'auto',
+								prev: '.cpis-carousel-left',
+								next: '.cpis-carousel-right',
+								auto: _auto
+							});
+						},
+						1000
+					);	
                 }
             }
             

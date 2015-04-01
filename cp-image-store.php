@@ -3,7 +3,7 @@
 Plugin Name: CP Image Store with Slideshow
 Plugin URI: http://wordpress.dwbooster.com/content-tools/image-store#download
 Description: Image Store is an online store for the sale of image files: images, predefined pictures, clipart, drawings, vector images. For payment processing, Image Store uses PayPal, which is the most widely used payment gateway, safe and easy to use.
-Version: 1.0.3
+Version: 1.0.4
 Author: CodePeople
 Author URI: http://www.codepeople.net
 License: GPLv2

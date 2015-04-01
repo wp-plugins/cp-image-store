@@ -58,7 +58,7 @@
 .cpis-image-multiple .cpis-preview-data a{ text-decoration: none; }
 
 /* CAROUSEL */
-#cpis-image-store-carousel{ position:relative; margin-bottom: 10px;}
+#cpis-image-store-carousel{ position:relative; margin-bottom: 10px; visibility:hidden; }
 #cpis-image-store-carousel ul{ margin: 0; padding: 0; list-style: none; display: block;}
 #cpis-image-store-carousel li{ display: block; margin: 0; padding: 0 5px; float:left; }
 #cpis-image-store-carousel li a{ display: block; }
