@@ -20,8 +20,8 @@
 #cpis_table td{padding: 10px; margin: 0; border: 0; vertical-align: top;}
 
 .cpis-image-size{ font-weight: bolder; }
-.cpis-image-price{ font-size: 1.3em; color: #085D79; font-weight: bold; }
-.cpis-store-total{ font-size: 1.3em; color: #085D79; padding: 0 5px; }
+.cpis-image-price{ font-size: 1em; color: #085D79; font-weight: bold; }
+.cpis-store-total{ font-size: 1em; color: #085D79; padding: 0 5px; }
 .cpis-store-total.invalid{ color: #CCC; text-decoration:line-through; }
 .cpis-paypal-button{ background: #8970B4 !important; border-color: #5E4684 !important; color: #FFF !important; margin-right: 5px;}
 
@@ -74,18 +74,13 @@
 .cpis-license-container .cpis-license-title{ cursor: none; font-weight: bold; }
 .cpis-license-container .cpis-license-close{ float: right; cursor: pointer; display: inline-block; }
 
-/* SHOPPING CART BUTTONS */
-.cpis-image-store-cart{ float: right; }
-.cpis-image-store-cart a{ text-decoration: none; }
-.cpis-image-store-cart .cpis-cart-icon{ width: 18px; height: 14px; background: url(cart.png) no-repeat 0 0; display: inline-block;}
-
 .cpis-error-mssg{ border: 1px solid #FF0000; color: #FF0000; text-align:center; width:100%; }
 .cpis-error-mssg ul{ list-style:none; }
 
 @media screen and (max-width:600px) {
 	.cpis-image-store{min-width:0;padding: 0 10px;}
-	.cpis-image-store-left{max-width:none;width:100%;clear:both;}
-	.cpis-image-store-right{width:100%;margin-left:0;}
+	.cpis-image-store-left{max-width:none;width:100% !important;clear:both;}
+	.cpis-image-store-right{width:100% !important;margin-left:0;}
 	.cpis-single-image-data .cpis-image-left{ width:100%; clear:both; }
 	.cpis-single-image-data .cpis-image-right,
 	.cpis-single-image-data .cpis-image-right.with-left{ width: 100%;padding:0;}

@@ -205,6 +205,17 @@ jQuery(function( $ ){
         });
     };
     
+	window[ 'cpis_export_csv' ] = function( e ){
+		e = $( e );
+		var f = e.closest( 'form' );
+		
+		e.after( '<input type="hidden" name="cpis-action" value="csv" />' );
+		f.attr( 'target', '_blank' )[ 0 ].submit();
+		f.attr( 'target', '_self' )
+		 .find( '[name="cpis-action"]' )
+		 .remove();
+	};
+	
     $( '#cpis_layout' ).change( 
 		function()
 		{

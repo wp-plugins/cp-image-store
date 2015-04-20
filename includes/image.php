@@ -608,7 +608,6 @@ if( !function_exists( 'cpis_save_image' ) ){
                 $data_arr[ 'file' ] .= '</ul>';
 
                 // Set the buy now button
-                // Check for shopping cart
                 $data_arr[ 'submit' ] = CPIS_H_URL.'?cpis-action=buynow';
                 $data_arr[ 'button' ] = '<input type="button" id="cpis-paypal-button" class="cpis-paypal-button" value="'.__( 'Buy Now', CPIS_TEXT_DOMAIN ).'" onclick="cpis_buynow(this);" />';
 				

@@ -3,25 +3,13 @@
 Plugin Name: CP Image Store with Slideshow
 Plugin URI: http://wordpress.dwbooster.com/content-tools/image-store#download
 Description: Image Store is an online store for the sale of image files: images, predefined pictures, clipart, drawings, vector images. For payment processing, Image Store uses PayPal, which is the most widely used payment gateway, safe and easy to use.
-Version: 1.0.4
+Version: 1.0.5
 Author: CodePeople
 Author URI: http://www.codepeople.net
 License: GPLv2
 */
 
 @session_start();
-if(!function_exists('cpis_get_site_url')){
-    function cpis_get_site_url(){
-        $url_parts = parse_url(get_site_url());
-        return rtrim( 
-                        ((!empty($url_parts["scheme"])) ? $url_parts["scheme"] : "http")."://".
-                        $_SERVER["HTTP_HOST"].
-                        ((!empty($url_parts["path"])) ? $url_parts["path"] : ""),
-                        "/"
-                    )."/";
-    }
-}
-
 // Global variable used to print the images preview in the website footer
 
 global $cpis_images_preview, $cpis_errors, $cpis_layout, $cpis_layouts;
@@ -35,7 +23,7 @@ $cpis_layout  = array();
 // CONST
 define( 'CPIS_PLUGIN_DIR', dirname( __FILE__ ) );
 define( 'CPIS_PLUGIN_URL', plugins_url( '', __FILE__ ) );
-define( 'CPIS_H_URL', cpis_get_site_url() );
+define( 'CPIS_H_URL', rtrim( get_home_url( get_current_blog_id() ), "/" ).( ( strpos( get_current_blog_id(), '?' ) === false ) ? "/" : "" ) );
 
 define( 'CPIS_UPLOAD_DIR', ( ( file_exists( CPIS_PLUGIN_DIR.'/uploads' ) ) ? CPIS_PLUGIN_DIR.'/uploads' : $cpis_upload_path[ 'basedir' ].'/cpis_uploads' ) );
 define( 'CPIS_UPLOAD_URL', ( ( file_exists( CPIS_PLUGIN_DIR.'/uploads' ) ) ? CPIS_PLUGIN_URL.'/uploads' : $cpis_upload_path[ 'baseurl' ].'/cpis_uploads' ) );
@@ -292,7 +280,7 @@ if( !function_exists( 'cpis_init_post_types' ) ){
                     ),
                     'query_var'            => true,
                     'has_archive'		   => true,	
-                    'rewrite'              => false
+                    'rewrite'              => true
                 )
             );			
             
@@ -588,27 +576,78 @@ if( !function_exists( 'cpis_admin_init' ) ){
         // Create database
         cpis_create_db();
 		
-		if( isset( $_REQUEST[ 'cpis-action' ] ) && $_REQUEST[ 'cpis-action' ] == 'paypal-data' ){
-			if( isset( $_REQUEST[ 'data' ] ) && isset( $_REQUEST[ 'from' ] ) && isset( $_REQUEST[ 'to' ] ) ){
-				$where = 'DATEDIFF(date, "'.$_REQUEST[ 'from' ].'")>=0 AND DATEDIFF(date, "'.$_REQUEST[ 'to' ].'")<=0';
-				switch( $_REQUEST[ 'data' ] ){
-					case 'residence_country':
-						print cpis_getFromPayPalData( array( 'residence_country' => 'residence_country'), 'COUNT(*) AS count', '', $where, array( 'residence_country' ), array( 'count' => 'DESC' ) );
-					break;	
-					case 'mc_currency':
-						print cpis_getFromPayPalData( array( 'mc_currency' => 'mc_currency'), 'SUM(amount) AS sum', '', $where, array( 'mc_currency' ), array( 'sum' => 'DESC' ) );
-					break;	
-					case 'product_name':
-						$from   = $wpdb->posts.' AS posts,'.$wpdb->prefix.CPIS_IMAGE_FILE.' AS image_file';
-						$where .= ' AND product_id = image_file.id_file AND posts.ID = image_file.id_image';
-						
-						$json =  cpis_getFromPayPalData( array( 'mc_currency' => 'mc_currency'), 'SUM(amount) AS sum, post_title', $from, $where, array( 'product_id', 'mc_currency' ) );
-						$obj = json_decode( $json );
-						foreach( $obj as $key => $value){
-							$obj[ $key ]->post_title .= ' ['.$value->mc_currency.']';
-						}
-						print json_encode( $obj );
-					break;
+		if( isset( $_REQUEST[ 'cpis-action' ] ) ){
+			if( $_REQUEST[ 'cpis-action' ] == 'paypal-data' )
+			{
+				if( isset( $_REQUEST[ 'data' ] ) && isset( $_REQUEST[ 'from' ] ) && isset( $_REQUEST[ 'to' ] ) ){
+					$where = 'DATEDIFF(date, "'.$_REQUEST[ 'from' ].'")>=0 AND DATEDIFF(date, "'.$_REQUEST[ 'to' ].'")<=0';
+					switch( $_REQUEST[ 'data' ] ){
+						case 'residence_country':
+							print cpis_getFromPayPalData( array( 'residence_country' => 'residence_country'), 'COUNT(*) AS count', '', $where, array( 'residence_country' ), array( 'count' => 'DESC' ) );
+						break;	
+						case 'mc_currency':
+							print cpis_getFromPayPalData( array( 'mc_currency' => 'mc_currency'), 'SUM(amount) AS sum', '', $where, array( 'mc_currency' ), array( 'sum' => 'DESC' ) );
+						break;	
+						case 'product_name':
+							$from   = $wpdb->posts.' AS posts,'.$wpdb->prefix.CPIS_IMAGE_FILE.' AS image_file';
+							$where .= ' AND product_id = image_file.id_file AND posts.ID = image_file.id_image';
+							
+							$json =  cpis_getFromPayPalData( array( 'mc_currency' => 'mc_currency'), 'SUM(amount) AS sum, post_title', $from, $where, array( 'product_id', 'mc_currency' ) );
+							$obj = json_decode( $json );
+							foreach( $obj as $key => $value){
+								$obj[ $key ]->post_title .= ' ['.$value->mc_currency.']';
+							}
+							print json_encode( $obj );
+						break;
+					}
+				}
+			}
+			elseif( $_REQUEST[ 'cpis-action' ] == 'csv' )
+			{
+				header("Content-type: application/octet-stream");
+				header("Content-Disposition: attachment; filename=export.csv");  
+				
+				$from_day = (isset($_POST['from_day'])) ? $_POST['from_day'] : date('j');
+				$from_month = (isset($_POST['from_month'])) ? $_POST['from_month'] : date('m');
+				$from_year = (isset($_POST['from_year'])) ? $_POST['from_year'] : date('Y');
+				$buyer = ( !empty( $_POST['buyer'] ) ) ? $_POST[ 'buyer' ] : '';
+				$buyer = trim( $buyer );
+				
+				$to_day = (isset($_POST['to_day'])) ? $_POST['to_day'] : date('j');
+				$to_month = (isset($_POST['to_month'])) ? $_POST['to_month'] : date('m');
+				$to_year = (isset($_POST['to_year'])) ? $_POST['to_year'] : date('Y');
+				
+				$csv_header = array( __( 'Date', CPIS_TEXT_DOMAIN ), __( 'Product', CPIS_TEXT_DOMAIN ), __( 'Buyer', CPIS_TEXT_DOMAIN ), __( 'Amount', CPIS_TEXT_DOMAIN ), __( 'Currency', CPIS_TEXT_DOMAIN ), __( 'Download link', CPIS_TEXT_DOMAIN ), __( 'Notes', CPIS_TEXT_DOMAIN ), '' );
+				$dlurl = _cpis_create_pages( 'cpis-download-page', 'Download Page' );
+				$dlurl .= ( ( strpos( $dlurl, '?' ) === false ) ? '?' : '&' );
+				
+				$_select .= "SELECT purchase.*, posts.*";
+				$_from 	 = " FROM ".$wpdb->prefix.CPIS_PURCHASE." AS purchase, ".$wpdb->prefix."posts AS posts, ".$wpdb->prefix.CPIS_IMAGE_FILE." AS image_file";
+				$_where  = " WHERE posts.ID = image_file.id_image 
+						  AND image_file.id_file = purchase.product_id 
+						  AND DATEDIFF(purchase.date, '{$from_year}-{$from_month}-{$from_day}')>=0 
+						  AND DATEDIFF(purchase.date, '{$to_year}-{$to_month}-{$to_day}')<=0 ";
+				if( !empty( $buyer ) )
+				{
+					$_where .= "AND purchase.email LIKE '%".mysql_real_escape_string( $buyer )."%'";
+				}
+        			  
+				$rows = $wpdb->get_results( $_select.$_from.$_where );
+				for ($i=0; $i < count( $csv_header ); $i++)
+					echo '"'.str_replace( '"', '""', $csv_header[ $i ] ).'",';
+				echo "\n";
+				foreach( $rows as $row )
+				{
+					$currency = "";
+					if(preg_match('/mc_currency=([^\s]*)/', $row->paypal_data, $matches) ) $currency = strtoupper($matches[1]);
+					
+					echo '"'.str_replace( '"', '""', $row->date ).'",';
+					echo '"'.str_replace( '"', '""', ( ( empty( $row->post_title ) ) ? $row->ID : $row->post_title ) ).'",';
+					echo '"'.str_replace( '"', '""', $row->email ).'",';
+					echo '"'.str_replace( '"', '""', $row->amount ).'",';
+					echo '"'.str_replace( '"', '""', $currency ).'",';
+					echo '"'.str_replace( '"', '""', $dlurl.'cpis-action=download&purchase_id='.$row->purchase_id ).'",';
+					echo "\n";
 				}
 			}
 			exit;
@@ -1415,7 +1454,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
 						foreach( $months_list as $month => $name ) print '<option value="'.$month.'"'.( ( $from_month == $month ) ? ' SELECTED' : '' ).'>'.$name.'</option>';
 					?>
 					</select>
-					<input type="text" name="from_year" value="<?php print $from_year; ?>" />
+					<input type="text" name="from_year" value="<?php print $from_year; ?>" size="5" />
 					
 					<label><?php _e( 'To: ', CPIS_TEXT_DOMAIN ); ?></label>
 					<select name="to_day">
@@ -1428,9 +1467,9 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
 						foreach( $months_list as $month => $name ) print '<option value="'.$month.'"'.( ( $to_month == $month ) ? ' SELECTED' : '' ).'>'.$name.'</option>';
 					?>
 					</select>
-					<input type="text" name="to_year" value="<?php print $to_year; ?>" />
-					
+					<input type="text" name="to_year" value="<?php print $to_year; ?>" size="5" />
 					<input type="submit" value="<?php _e('Search', CPIS_TEXT_DOMAIN); ?>" class="button-primary" />
+					<input type="button" value="<?php _e('Export CSV', CPIS_TEXT_DOMAIN); ?>" class="button" onclick="cpis_export_csv( this );" />
 				</div>
 				
 				<div style="float:left;margin-right:20px;">
@@ -1850,7 +1889,10 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
         $page_id = 'cpis_page_'.get_the_ID();
         $option_none = __( $option_none, CPIS_TEXT_DOMAIN );
         
-        if( !is_null( $_SESSION[ $page_id ][ $taxonomy ] ) && !is_numeric( $_SESSION[ $page_id ][ $taxonomy ] ) )
+        if( 
+			isset( $_SESSION[ $page_id ][ $taxonomy ] ) && 
+			!is_null( $_SESSION[ $page_id ][ $taxonomy ] ) && 
+			!is_numeric( $_SESSION[ $page_id ][ $taxonomy ] ) )
         {
            $obj = get_term_by( 'slug', $_SESSION[ $page_id ][ $taxonomy ], $taxonomy );
            $_SESSION[ $page_id ][ $taxonomy ] = $obj->term_id;
