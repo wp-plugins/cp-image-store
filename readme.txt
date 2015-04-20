@@ -29,6 +29,7 @@ CP Image Store with Slideshow features:
     § Shows a carousel with the top 10 images obtained with the filter values
     § Includes a module to track sales statistics.
 	  Displays animated charts for specific sales reports
+	§ Allows exporting the sales reports to a CSV file
 
 CP Image Store with Slideshow is an online store for the sale of image files: images, predefined pictures, clipart, drawings, vector images. For payment processing, CP Image Store with Slideshow uses PayPal, which is the most widely used payment gateway, safe and easy to use.
 
@@ -117,6 +118,7 @@ This section includes setup options for each of the images.
 *   Units: Unit of measure for the images to be displayed in the CP Image Store with Slideshow and on the page of the image.
 *   Set watermark: Mark this checkbox if you want to display a watermark on image previews. 
 *   Watermark text: Enter the text for the watermark.
+*   Watermark position: Allows display the watermark at bottom or middle of the images previews.
 *   Thumbnail width: Width of the thumbnail in pixels.
 *   Thumbnail height: Height of the thumbnail in pixels.
 *   Intermediate width: Width of the image preview in pixels.
@@ -243,11 +245,13 @@ If you want to insert the images list on the website sidebars, there is availabl
 
 When a sale takes place, a notification is emailed to the CP Image Store with Slideshow administrator, but sales reports can also be viewed. To do this, go to the menu option "Image Store / Sales Report".
 
-The reports section allows to filter sales  by period. By default, current day's sales are shown, but it also displays sales' totals for the selected period, and the currency in which items were sold.
+The reports section allows to filter sales by period, and buyers. By default, current day's sales are shown, but it also displays sales' totals for the selected period, and the currency in which items were sold.
 
 You can delete a sales report from the list of sales. This may be needed in case of a refund, to make sure that your sales statistics reflect the real situation with the updated figures.
 
-The statistics module allow to display animated charts for specific reports.
+The statistics module allows to display animated charts for specific reports.
+
+This module includes the "Export CSV" button for exporting the sales reports (that satisfy the filtering options), to a CSV file.
 
 == Frequently Asked Questions ==
 
