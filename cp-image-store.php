@@ -1652,7 +1652,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
         global $post;
         
         if(
-            $hook == 'image-store_page_image-store-menu-settings'
+            $hook == 'image-store_page_image-store-menu-settings'  || $hook == 'settings_page_image-store-menu-settings-page'
         ){
             wp_enqueue_style('jquery-style', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/themes/smoothness/jquery-ui.css');
             wp_enqueue_style('cpis-admin-style', CPIS_PLUGIN_URL.'/css/admin.css');
