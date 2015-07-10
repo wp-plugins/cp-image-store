@@ -3,7 +3,7 @@
 Plugin Name: CP Image Store with Slideshow
 Plugin URI: http://wordpress.dwbooster.com/content-tools/image-store#download
 Description: Image Store is an online store for the sale of image files: images, predefined pictures, clipart, drawings, vector images. For payment processing, Image Store uses PayPal, which is the most widely used payment gateway, safe and easy to use.
-Version: 1.0.6
+Version: 1.0.7
 Author: CodePeople
 Author URI: http://www.codepeople.net
 License: GPLv2
@@ -2229,9 +2229,32 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
     }
  } // End cpis_setError
  
+ if( !function_exists( 'cpis_getIP' ) )
+{
+	function cpis_getIP()
+	{
+		$ip = $_SERVER[ 'REMOTE_ADDR' ];
+		if( !empty( $_SERVER[ 'HTTP_CLIENT_IP' ] ) ) 
+		{
+			$ip = $_SERVER[ 'HTTP_CLIENT_IP' ];
+		}
+		elseif( !empty( $_SERVER[ 'HTTP_X_FORWARDED_FOR' ] ) ) 
+		{
+			$ip = $_SERVER[ 'HTTP_X_FORWARDED_FOR' ];
+		}
+ 
+		return str_replace( array( ':', '.' ), array( '_', '_' ), $ip );
+	}
+}
+ 
  if( !function_exists( 'cpis_check_download_permissions' ) ){
 	function cpis_check_download_permissions(){
-
+		if( get_transient( 'cpis_penalized_ip_'.cpis_getIP() ) !== false )
+		{
+			_e( 'Please, try again in 30 minutes.', CPIS_TEXT_DOMAIN );
+			exit;
+		}	
+		delete_transient( 'cpis_penalized_ip_'.cpis_getIP() );
 		global $wpdb;
 		
 		// Check if the file is a file managed by the plugin
@@ -2276,6 +2299,15 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
 		$options = get_option( 'cpis_options' );
 		$valid_download = ( !empty( $options[ 'store' ][ 'download_link' ] ) ) ? $options[ 'store' ][ 'download_link' ] : 3 ;
 		if( is_null( $data ) ){
+			if( get_transient( 'cpis_suspect_ip_'.cpis_getIP() ) !== false )
+			{
+				delete_transient( 'cpis_suspect_ip_'.cpis_getIP() );
+				set_transient( 'cpis_penalized_ip_'.cpis_getIP(), true,  1800 );
+				_e( 'The purchase ID is incorrect, please, try again in 30 minutes.', CPIS_TEXT_DOMAIN );
+				exit;
+			}
+			set_transient( 'cpis_suspect_ip_'.cpis_getIP(), true,  1800 );
+			
 			if( !isset( $_REQUEST[ 'timeout' ] ) )
             {
                 cpis_setError(
@@ -2291,13 +2323,15 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
             }    
 			return false;
 		}elseif( $valid_download < $data->days ){ 
+			delete_transient( 'cpis_suspect_ip_'.cpis_getIP() );
 			cpis_setError( 'The download link has expired, please contact to the vendor' );
 			return false;	
 		}elseif( $options[ 'store' ][ 'download_limit' ] > 0 &&  $options[ 'store' ][ 'download_limit' ] <= $data->downloads ){
+			delete_transient( 'cpis_suspect_ip_'.cpis_getIP() );
 			cpis_setError( 'The number of downloads has reached its limit, please contact to the vendor' );
 			return false;
 		}
-
+		delete_transient( 'cpis_suspect_ip_'.cpis_getIP() );
 		if( isset( $_REQUEST[ 'f' ] ) && !isset( $_SESSION[ 'cpis_donwloads' ] ) )
 		{
 			$_SESSION[ 'cpis_donwloads' ] = 1;
