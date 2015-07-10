@@ -3,7 +3,7 @@
 Plugin Name: CP Image Store with Slideshow
 Plugin URI: http://wordpress.dwbooster.com/content-tools/image-store#download
 Description: Image Store is an online store for the sale of image files: images, predefined pictures, clipart, drawings, vector images. For payment processing, Image Store uses PayPal, which is the most widely used payment gateway, safe and easy to use.
-Version: 1.0.5
+Version: 1.0.6
 Author: CodePeople
 Author URI: http://www.codepeople.net
 License: GPLv2
@@ -2234,6 +2234,16 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
 
 		global $wpdb;
 		
+		// Check if the file is a file managed by the plugin
+		if( isset( $_REQUEST[ 'f' ] ) )
+		{
+			$f_tmp = basename($_REQUEST[ 'f' ]);
+			if( empty( $f_tmp ) || !file_exists( CPIS_DOWNLOAD.'/'.$f_tmp ) )
+			{
+				return false;
+			}	
+		}
+		
 		// If not session, create it
 		if( session_id() == "" ) session_start();
 
@@ -2503,13 +2513,14 @@ if( !function_exists( 'cpis_download_file' ) ){
 		global $wpdb, $cpis_errors;
 		
 		if( isset( $_REQUEST[ 'f' ] ) && cpis_check_download_permissions() ){
-			header( 'Content-Type: '.cpis_mime_content_type( basename( $_REQUEST[ 'f' ] ) ) );
-			header( 'Content-Disposition: attachment; filename="'.$_REQUEST[ 'f' ].'"' );
-			if( cpis_checkMemory( array( CPIS_DOWNLOAD.'/'.$_REQUEST[ 'f' ] ) ) ){
-				readfile( CPIS_DOWNLOAD.'/'.$_REQUEST[ 'f' ] );
+			$file = basename( $_REQUEST[ 'f' ] );
+			header( 'Content-Type: '.cpis_mime_content_type( $file ) );
+			header( 'Content-Disposition: attachment; filename="'.$file.'"' );
+			if( cpis_checkMemory( array( CPIS_DOWNLOAD.'/'.$file ) ) ){
+				readfile( CPIS_DOWNLOAD.'/'.$file );
 			}else{
 				@unlink( CPIS_DOWNLOAD.'/.htaccess');
-				header( 'location:'.CPIS_PLUGIN_URL.'/downloads/'.$_REQUEST[ 'f' ] );
+				header( 'location:'.CPIS_PLUGIN_URL.'/downloads/'.$file );
 			}
 		}else{
 			$dlurl = _cpis_create_pages( 'cpis-download-page', 'Download Page' );
