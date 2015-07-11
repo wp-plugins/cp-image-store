@@ -162,13 +162,20 @@ jQuery(function( $ ){
                 $.getJSON( 
                     image_store.hurl+'wp-admin/?cpis-action=remove-image&image='+id, 
                     function( data ){
-                        if( data.error){ 
-                            alert( data.error );
-                            e.parents('tr').fadeTo( 'normal', 1 );
-                            e.data( 'processing', 0 );
-                        }else{
-                            e.parents('tr').remove();
-                        }    
+						try
+						{
+							if( data.error){ 
+								alert( data.error );
+								e.parents('tr').fadeTo( 'normal', 1 );
+								e.data( 'processing', 0 );
+							}else{
+								e.parents('tr').remove();
+							}
+						}
+                        catch( err )
+						{
+							e.parents('tr').fadeTo( 'normal', 1 );
+						}
                     }
                 );
             }

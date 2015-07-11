@@ -3,7 +3,7 @@
 Plugin Name: CP Image Store with Slideshow
 Plugin URI: http://wordpress.dwbooster.com/content-tools/image-store#download
 Description: Image Store is an online store for the sale of image files: images, predefined pictures, clipart, drawings, vector images. For payment processing, Image Store uses PayPal, which is the most widely used payment gateway, safe and easy to use.
-Version: 1.0.7
+Version: 1.0.8
 Author: CodePeople
 Author URI: http://www.codepeople.net
 License: GPLv2
@@ -23,6 +23,7 @@ $cpis_layout  = array();
 // CONST
 define( 'CPIS_PLUGIN_DIR', dirname( __FILE__ ) );
 define( 'CPIS_PLUGIN_URL', plugins_url( '', __FILE__ ) );
+define( 'CPIS_ADMIN_URL', rtrim( admin_url( get_current_blog_id() ), "/" )."/" );
 define( 'CPIS_H_URL', rtrim( get_home_url( get_current_blog_id() ), "/" ).( ( strpos( get_current_blog_id(), '?' ) === false ) ? "/" : "" ) );
 
 define( 'CPIS_UPLOAD_DIR', ( ( file_exists( CPIS_PLUGIN_DIR.'/uploads' ) ) ? CPIS_PLUGIN_DIR.'/uploads' : $cpis_upload_path[ 'basedir' ].'/cpis_uploads' ) );
@@ -601,6 +602,7 @@ if( !function_exists( 'cpis_admin_init' ) ){
 						break;
 					}
 				}
+				exit;
 			}
 			elseif( $_REQUEST[ 'cpis-action' ] == 'csv' )
 			{
@@ -649,8 +651,9 @@ if( !function_exists( 'cpis_admin_init' ) ){
 					echo '"'.str_replace( '"', '""', $dlurl.'cpis-action=download&purchase_id='.$row->purchase_id ).'",';
 					echo "\n";
 				}
+				exit;
 			}
-			exit;
+			
 		}
             
         // Init the metaboxs for images
@@ -1671,14 +1674,14 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
             // Scripts and styles required for metaboxs
             wp_enqueue_style('jquery-style', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/themes/smoothness/jquery-ui.css');
             wp_enqueue_style('cpis-admin-style', CPIS_PLUGIN_URL.'/css/admin.css');
-            wp_localize_script( 'cpis-admin-script', 'image_store', array( 'post_id' => $post->ID, 'hurl' => CPIS_H_URL) );					
+            wp_localize_script( 'cpis-admin-script', 'image_store', array( 'post_id' => $post->ID, 'hurl' => CPIS_ADMIN_URL) );					
         }else if(
             $hook == 'image-store_page_image-store-menu-reports'
         ){
 			wp_enqueue_style('cpis-admin-style', CPIS_PLUGIN_URL.'/css/admin.css');
 			wp_enqueue_script('cpis-admin-script-chart', CPIS_PLUGIN_URL.'/js/Chart.min.js', array('jquery'), null, true);
             wp_enqueue_script('cpis-admin-script', CPIS_PLUGIN_URL.'/js/admin.js', array('jquery'), null, true);
-			wp_localize_script('cpis-admin-script', 'cpis_global', array( 'aurl' => admin_url() ));
+			wp_localize_script('cpis-admin-script', 'cpis_global', array( 'aurl' => CPIS_ADMIN_URL ));
         }else if( isset( $post ) ){
             
             wp_enqueue_script('jquery-ui-core');
