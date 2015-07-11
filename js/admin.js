@@ -160,7 +160,7 @@ jQuery(function( $ ){
             if( image_store && image_store.hurl ){
                 e.parents('tr').fadeTo( 'normal', 0.5 );
                 $.getJSON( 
-                    image_store.hurl+'wp-admin/?cpis-action=remove-image&image='+id, 
+                    image_store.hurl+'?cpis-action=remove-image&image='+id, 
                     function( data ){
 						try
 						{
