@@ -3,7 +3,7 @@
 Plugin Name: CP Image Store with Slideshow
 Plugin URI: http://wordpress.dwbooster.com/content-tools/image-store#download
 Description: Image Store is an online store for the sale of image files: images, predefined pictures, clipart, drawings, vector images. For payment processing, Image Store uses PayPal, which is the most widely used payment gateway, safe and easy to use.
-Version: 1.0.8
+Version: 1.0.9
 Author: CodePeople
 Author URI: http://www.codepeople.net
 License: GPLv2
@@ -281,7 +281,7 @@ if( !function_exists( 'cpis_init_post_types' ) ){
                     ),
                     'query_var'            => true,
                     'has_archive'		   => true,	
-                    'rewrite'              => true
+                    'rewrite'              => ( ( get_option( 'cpis_friendly_url', false )*1 ) ? true : false )
                 )
             );			
             
@@ -877,6 +877,7 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
 				
             update_option( 'cpis_options', $noptions );
 			update_option( 'cpis_safe_download', ( ( isset( $_POST[ 'cpis_safe_download' ] ) ) ? true : false ) );
+			update_option( 'cpis_friendly_url', ((isset($_POST['cpis_friendly_url'])) ? 1 : 0));
 			
             $options = $noptions;
 ?>				
@@ -965,6 +966,10 @@ if( !function_exists( 'cpis_exclude_pages' ) ){
                             <td><input type="text" name="cpis_columns" value="<?php echo esc_attr( $options[ 'store' ][ 'columns' ] ); ?>" /></td>
                         </tr>
                         <tr valign="top">
+							<th><?php _e('Uses friendly URLs on products', CPIS_TEXT_DOMAIN); ?></th>
+							<td><input type="checkbox" name="cpis_friendly_url" value="1" <?php if (get_option('cpis_friendly_url', false)) echo 'checked'; ?> /></td>
+						</tr>
+						<tr valign="top">
                             <th><?php _e('Show buttons for sharing in social networks', CPIS_TEXT_DOMAIN); ?></th>
                             <td>
                                 <input type="checkbox" name="cpis_social_buttons" <?php echo ( ( isset( $options[ 'store' ][ 'social_buttons' ] ) && $options[ 'store' ][ 'social_buttons' ] ) ? 'CHECKED' : '' ); ?> /><br />

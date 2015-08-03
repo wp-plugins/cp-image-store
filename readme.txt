@@ -4,7 +4,7 @@ Donate link: http://wordpress.dwbooster.com/content-tools/image-store
 Tags:sell pictures,gallery,galleries,image store,paypal,photo store,slideshow,photo gallery,photography,photos,sell digital print,sell images,sell photo,sell photos,photo selling,images,image,photos,pictures,clipart,sell clipart,vector,e-commerce,ecommerce,facebook,google,google+,html5,carousel,shop,social,social network,store,twitter,discounts,post,posts,page,widget,plugin,admin,shortcode,comments,sidebar
 Requires at least: 3.5.0
 Tested up to: 4.3
-Stable tag: 1.0.8
+Stable tag: 1.0.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -380,38 +380,14 @@ category: allows display in the store the images belonging to the category defin
 
 * Corrects a conflict in the action of deleting images.
 
+= 1.0.9 =
+
+* Allows activate/deactivate the use of friendly URLs for the store's products.
+
 == Upgrade Notice ==
 
-= 1.0.8 =
+= 1.0.9 =
 
-* Corrects a conflict in the action of deleting images.
+* Allows activate/deactivate the use of friendly URLs for the store's products.
 
 Important note: If you are using the Professional version don't update via the WP dashboard but using your personal update link. Contact us if you need further information: http://wordpress.dwbooster.com/support
-
-= 1.0.7 =
-
-* Security update to prevent the use of brute force to identify the purchase IDs
-
-= 1.0.6 =
-
-* Security update for the download process of purchased files.
-
-= 1.0.5 =
-
-* Includes a new button in the sales reports, for exporting all of them to a CSV file.
-* Allows apply to the products, the permalinks structure used in by WordPress.
-* Modifies the styles applied to the store.
-* Corrects the selection of home page's URL in a WordPress multisite.
-
-= 1.0.4 =
-
-* Modifies the carousel with the top ten images, to correct an issue in Safari browser.
-
-= 1.0.3 =
-
-* Modifies the interface of the store's settings.
-
-= 1.0.2 =
-
-* Allows to distribute images for free. The images without a price defined, or if the PayPal option is disabled in the store's settings, appear download links beside the images,
-* Uses functions included since WordPress 3.5.0, that modifies the requirements.
